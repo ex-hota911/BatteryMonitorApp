@@ -1,0 +1,31 @@
+<html>
+  <head>
+    <title>Go Guestbook</title>
+  </head>
+  <body>
+	<div>Hello, {{.User.String}}.</div>
+	<table>
+	{{range .Devices}}
+  	  <tr>
+		<td> {{.DeviceName}} </td>
+		<td> {{.DeviceId}} </td>
+	  </tr>
+	{{end}}
+	</table>
+
+	<!-- Register/Update a device -->
+    <form action="/register" method="post">
+      <div>Device ID: <input type="text" name="device_id"></div>
+      <div>Device Name: <input type="text" name="device_name"></div>
+      <div>Alert Threshold: <input type="text" name="alert_threshold"></div>
+      <div><input type="submit" value="Register"></div>
+    </form>
+
+	<!-- Log battery -->
+    <form action="/battery" method="post">
+      <div>Device ID: <input type="text" name="device_id"></div>
+      <div>Battery: <input type="text" name="alert_threshold"></div>
+      <div><input type="submit" value="Register"></div>
+    </form>
+  </body>
+</html>
