@@ -46,7 +46,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-var registerTemplate = template.Must(template.ParseFiles("register.html"))
+var registerTemplate = template.Must(template.ParseFiles("index.html"))
 
 func register(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
