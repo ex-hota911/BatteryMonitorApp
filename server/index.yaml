@@ -10,9 +10,25 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
+- kind: Battery
+  ancestor: yes
+  properties:
+  - name: ID
+
+- kind: Battery
+  ancestor: yes
+  properties:
+  - name: __key__
+    direction: desc
+
 - kind: Device
   properties:
   - name: UserId
+  - name: DeviceName
+
+- kind: Device
+  ancestor: yes
+  properties:
   - name: DeviceName
 
 - kind: Greeting

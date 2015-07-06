@@ -3,6 +3,8 @@ package guestbook
 import (
 	"html/template"
 	"net/http"
+	"strconv"
+	"time"
 
 	"appengine"
 	"appengine/datastore"
@@ -12,6 +14,7 @@ import (
 func init() {
 	http.HandleFunc("/", root)
 	http.HandleFunc("/register", register)
+	http.HandleFunc("/battery", battery)
 }
 
 func root(w http.ResponseWriter, r *http.Request) {
@@ -20,6 +23,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 	if u == nil {
 		url, err := user.LoginURL(c, r.URL.String())
 		if err != nil {
+			c.Errorf(err.Error())
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -28,16 +32,30 @@ func root(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	q := datastore.NewQuery("Device").Filter("UserId =", u.ID).Order("DeviceName")
-
-	devices := make([]Device, 10)
-	if _, err := q.GetAll(c, &devices); err != nil {
+	q := datastore.NewQuery("Device").Ancestor(userKey(u, c)).Order("DeviceName")
+	devices := []Device{}
+	keys := []*datastore.Key{}
+	var err error
+	if keys, err = q.GetAll(c, &devices); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	history := [][]Battery{}
+	for _, key := range keys {
+		qb := datastore.NewQuery("Battery").Ancestor(key).Order("-__key__")
+		h := []Battery{}
+		if _, err := qb.GetAll(c, &h); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		history = append(history, h)
+	}
+
 	data := map[string]interface{}{
-		"User":    u,
-		"Devices": devices,
+		"User":           u,
+		"Devices":        devices,
+		"BatteryHistory": history,
 	}
 
 	if err := registerTemplate.Execute(w, &data); err != nil {
@@ -57,10 +75,13 @@ func register(w http.ResponseWriter, r *http.Request) {
 
 	device := r.FormValue("device_id")
 	deviceName := r.FormValue("device_name")
+
 	// Default threshold is 15
 	threshold := int32(15)
+	if t, err := strconv.Atoi(r.FormValue("alert_threshold")); err == nil {
+		threshold = int32(t)
+	}
 
-	strKey := u.String() + ":" + device
 	g := Device{
 		UserId:         u.ID,
 		DeviceId:       device,
@@ -68,8 +89,7 @@ func register(w http.ResponseWriter, r *http.Request) {
 		AlertThreshold: threshold,
 	}
 
-	key := datastore.NewKey(c, "Device", strKey, 0, nil)
-	_, err := datastore.Put(c, key, &g)
+	_, err := datastore.Put(c, deviceKey(u, device, c), &g)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -77,5 +97,34 @@ func register(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 
-func registerDevice(u *user.User, c appengine.Context, w http.ResponseWriter, r *http.Request) {
+func battery(w http.ResponseWriter, r *http.Request) {
+	c := appengine.NewContext(r)
+	u := user.Current(c)
+	if u == nil {
+		http.Redirect(w, r, "/", http.StatusFound)
+	}
+
+	device := r.FormValue("device_id")
+
+	battery, err := strconv.Atoi(r.FormValue("battery"))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	t := time.Now()
+
+	b := Battery{
+		UserId:   u.ID,
+		DeviceId: device,
+		Battery:  int32(battery),
+		Time:     t,
+	}
+
+	_, err = datastore.Put(c, batteryKey(u, device, t, c), &b)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	http.Redirect(w, r, "/", http.StatusFound)
 }

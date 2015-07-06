@@ -1,19 +1,37 @@
 <html>
   <head>
-    <title>Go Guestbook</title>
+    <title>Battery Monitor</title>
   </head>
   <body>
+	<h2>Battery Monitor</h2>
 	<div>Hello, {{.User.String}}.</div>
-	<table>
-	{{range .Devices}}
+
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+	  var battery = {{.BatteryHistory}}
+	</script>
+    <script type="text/javascript" src="static/chart.js">
+    </script>
+	<div>Devices</div>
+	<table border=1>
   	  <tr>
-		<td> {{.DeviceName}} </td>
-		<td> {{.DeviceId}} </td>
+		<td>Device Name</td>
+		<td>Device ID</td>
+		<td>Alert Threshold</td>
+		<td>Battery</td>
+	  </tr>
+	{{range $index, $device := .Devices}}
+  	  <tr>
+		<td> {{$device.DeviceName}} </td>
+		<td> {{$device.DeviceId}} </td>
+		<td> {{$device.AlertThreshold}} </td>
+		<td> <div id="chart_{{$index}}" style="width: 900px; height: 500px"></div></td>
 	  </tr>
 	{{end}}
 	</table>
 
 	<!-- Register/Update a device -->
+	<h3>Register Device</h3>
     <form action="/register" method="post">
       <div>Device ID: <input type="text" name="device_id"></div>
       <div>Device Name: <input type="text" name="device_name"></div>
@@ -22,10 +40,11 @@
     </form>
 
 	<!-- Log battery -->
+	<h3>Update Battery History</h3>
     <form action="/battery" method="post">
       <div>Device ID: <input type="text" name="device_id"></div>
-      <div>Battery: <input type="text" name="alert_threshold"></div>
-      <div><input type="submit" value="Register"></div>
+      <div>Battery: <input type="text" name="battery"></div>
+      <div><input type="submit" value="Update"></div>
     </form>
   </body>
 </html>
