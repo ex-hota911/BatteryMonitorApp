@@ -1,4 +1,4 @@
-package api
+package guestbook
 
 import (
 	"log"
@@ -18,8 +18,17 @@ type BatteryListResp struct {
 type BatteryService struct {
 }
 
-func (bs *BatteryService) List(c endpoints.Content, r *BatteryListReq) (*BatteryListResp, error) {
+func (bs *BatteryService) List(c endpoints.Context, r *BatteryListReq) (*BatteryListResp, error) {
+	return nil, nil
+}
 
+type BatteryUpdateReq struct {
+}
+
+type BatteryUpdateResp struct {
+}
+
+func (bs *BatteryService) Update(c endpoints.Context, r *BatteryUpdateReq) (*BatteryUpdateResp, error) {
 	return nil, nil
 }
 
