@@ -9,6 +9,20 @@ import (
 	"appengine/datastore"
 )
 
+type BatteryListReq struct {
+}
+
+type BatteryListResp struct {
+}
+
+type BatteryService struct {
+}
+
+func (bs *BatteryService) List(c endpoints.Content, r *BatteryListReq) (*BatteryListResp, error) {
+
+	return nil, nil
+}
+
 // Greeting is a datastore entity that represents a single greeting.
 // It also serves as (a part of) a response of GreetingService.
 type Greeting struct {
