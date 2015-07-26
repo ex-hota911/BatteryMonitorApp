@@ -1,4 +1,4 @@
-package guestbook
+package server
 
 import (
 	"html/template"

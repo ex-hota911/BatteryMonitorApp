@@ -1,7 +1,10 @@
-package guestbook
+package server
 
 import (
 	"log"
+	"net/http"
+	"os/user"
+	"strconv"
 	"time"
 
 	"github.com/GoogleCloudPlatform/go-endpoints/endpoints"
@@ -18,18 +21,59 @@ type BatteryListResp struct {
 type BatteryService struct {
 }
 
+type TimestampNanos time.Time
+
 func (bs *BatteryService) List(c endpoints.Context, r *BatteryListReq) (*BatteryListResp, error) {
 	return nil, nil
 }
 
-type BatteryUpdateReq struct {
+type UpdateReq struct {
+	Id        string    `json:"id"`
+	Histories []History `json:"histories"`
 }
 
-type BatteryUpdateResp struct {
+type History struct {
+	Level           int32 `json:"level"`
+	TimestampMillis Time  `json:"timestamp"`
 }
 
-func (bs *BatteryService) Update(c endpoints.Context, r *BatteryUpdateReq) (*BatteryUpdateResp, error) {
-	return nil, nil
+func (bs *BatteryService) Update(c endpoints.Context, r *UpdateReq) error {
+}
+
+type BatteryRegisterReq struct {
+	DeviceId       string `json:"id"`              // Unique ID for a device
+	DeviceName     string `json:"name"`            // Display name.
+	AlertThreshold int32  `json:"alert_threshold"` // 0 - 100.
+}
+
+func (bs *BatteryService) Register(c endpoints.Context, r *BatteryRegisterReq) error {
+	u := user.Current(c)
+	if u == nil {
+		return endpoints.UnauthorizedError
+	}
+
+	device := r.FormValue("device_id")
+	deviceName := r.FormValue("device_name")
+
+	// Default threshold is 15
+	threshold := int32(15)
+	if t, err := strconv.Atoi(r.FormValue("alert_threshold")); err == nil {
+		threshold = int32(t)
+	}
+
+	g := Device{
+		UserId:         u.ID,
+		DeviceId:       device,
+		DeviceName:     deviceName,
+		AlertThreshold: threshold,
+	}
+
+	_, err := datastore.Put(c, deviceKey(u, device, c), &g)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 // Greeting is a datastore entity that represents a single greeting.
