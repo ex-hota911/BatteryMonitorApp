@@ -29,15 +29,17 @@ func guestbookKey(c appengine.Context) *datastore.Key {
 }
 
 func userKey(u *user.User, c appengine.Context) *datastore.Key {
-	return datastore.NewKey(c, "User", u.ID, 0, nil)
+	return datastore.NewKey(c, "User", u.Email, 0, nil)
 }
 
 func deviceKey(u *user.User, d string, c appengine.Context) *datastore.Key {
 	uk := userKey(u, c)
+	c.Debugf("%#v", uk)
 	return datastore.NewKey(c, "Device", d, 0, uk)
 }
 
 func batteryKey(u *user.User, d string, t time.Time, c appengine.Context) *datastore.Key {
 	dk := deviceKey(u, d, c)
+	c.Debugf("%#v", dk)
 	return datastore.NewKey(c, "Battery", "", t.Unix(), dk)
 }
