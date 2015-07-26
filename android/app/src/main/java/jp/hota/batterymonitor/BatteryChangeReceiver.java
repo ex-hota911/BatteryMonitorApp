@@ -18,6 +18,7 @@ public class BatteryChangeReceiver extends BroadcastReceiver {
         if (currentLevel >= 0 && scale > 0) {
             level = (currentLevel * 100) / scale;
         }
+
         Log.d("BatteryChangeReceiver", "" + level);
         if (MainActivity.textView != null) {
             MainActivity.textView.setText("" + level);

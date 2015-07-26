@@ -3,22 +3,22 @@ package server
 import (
 	"log"
 	"net/http"
-	"os/user"
 	"strconv"
 	"time"
 
 	"github.com/GoogleCloudPlatform/go-endpoints/endpoints"
 
 	"appengine/datastore"
+	"appengine/user"
 )
+
+type BatteryService struct {
+}
 
 type BatteryListReq struct {
 }
 
 type BatteryListResp struct {
-}
-
-type BatteryService struct {
 }
 
 type TimestampNanos time.Time
@@ -33,11 +33,12 @@ type UpdateReq struct {
 }
 
 type History struct {
-	Level           int32 `json:"level"`
-	TimestampMillis Time  `json:"timestamp"`
+	Level           int32     `json:"level"`
+	TimestampMillis time.Time `json:"timestamp"`
 }
 
 func (bs *BatteryService) Update(c endpoints.Context, r *UpdateReq) error {
+	return nil
 }
 
 type BatteryRegisterReq struct {
