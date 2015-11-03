@@ -37,9 +37,8 @@ public class MainActivity extends AppCompatActivity {
 
     final static String PREF_ACCOUNT_NAME = "ACCOUNT_NAME";
     final static String CLIENT_ID = "server:client_id:"
-            + "546634630324-lhicestiq2l8osfobdhehi9iprgu9c3n.apps.googleusercontent.com";
-    final static String CLIENT_ID2 = "server:client_id:"
-     + "546634630324-o1b8i5jp5985tha39ob06vhhokmi04o3.apps.googleusercontent.com";
+            + "546634630324-mkannoor781g7scn86vodbhol9qss1ev.apps.googleusercontent.com";
+//            + "546634630324-lhicestiq2l8osfobdhehi9iprgu9c3n.apps.googleusercontent.com";
 
     static TextView textView;
     private Battery service;
