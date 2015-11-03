@@ -23,8 +23,8 @@ type BatteryService struct {
 }
 
 type UpdateReq struct {
-	Id        string    `json:"id"`
-	Histories []History `json:"items"`
+	DeviceId  string
+	Histories []History
 }
 
 type History struct {
@@ -40,8 +40,8 @@ func (s *BatteryService) Update(c endpoints.Context, r *UpdateReq) error {
 
 	d := Device{
 		UserId:         u.ID,
-		DeviceId:       r.Id,
-		DeviceName:     r.Id,
+		DeviceId:       r.DeviceId,
+		DeviceName:     r.DeviceId,
 		AlertThreshold: 15,
 	}
 	c.Debugf("%#v", deviceKey(u, d.DeviceId, c))
@@ -54,7 +54,7 @@ func (s *BatteryService) Update(c endpoints.Context, r *UpdateReq) error {
 	for _, h := range r.Histories {
 		b := Battery{
 			UserId:   u.ID,
-			DeviceId: r.Id,
+			DeviceId: r.DeviceId,
 			Battery:  h.Level,
 			Time:     h.Time,
 		}
@@ -66,6 +66,22 @@ func (s *BatteryService) Update(c endpoints.Context, r *UpdateReq) error {
 		}
 	}
 	return nil
+}
+
+type ReadReq struct {
+}
+
+type ReadResp struct {
+}
+
+func (s *BatteryService) Read(c endpoints.Context, req *ReadReq) (*ReadResp, error) {
+	u, err := getCurrentUser(c)
+	if err != nil {
+		return nil, err
+	}
+	_ = u
+	resp := new(ReadResp)
+	return resp, nil
 }
 
 // getCurrentUser retrieves a user associated with the request.

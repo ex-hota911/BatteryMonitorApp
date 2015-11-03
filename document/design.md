@@ -4,14 +4,17 @@
 
 *User*
 
-+ (PK) user_id: string - _email address_
++ (PK) user_id: string
+  + email address
 
 *Device*
 
 + (PK) device_id: string
 + device name: string
-+ alert threshold: int - _0 to 100_
++ alert threshold: int
+  + 0 to 100
 + (optional) history: []Battery
+  + Used only for API
 
 *Battery*
 
@@ -24,6 +27,10 @@
 
 + Request
   + devices: []Device
+    + (required) device_id
+	+ history: []Battery
+	  + (required) battery
+	  + (optional) time
 + Response
 
 *List*
