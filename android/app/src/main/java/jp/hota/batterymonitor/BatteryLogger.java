@@ -42,11 +42,4 @@ public class BatteryLogger extends Service {
     public IBinder onBind(Intent intent) {
         return null;
     }
-
-    public class BatteryLoggerStarter extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            startService(new Intent(context, BatteryLogger.class));
-        }
-    }
 }

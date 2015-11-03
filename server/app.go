@@ -19,7 +19,7 @@ func init() {
 
 func root(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
-	u := user.Current(c)
+	u := toUser(user.Current(c))
 	if u == nil {
 		url, err := user.LoginURL(c, r.URL.String())
 		if err != nil {
@@ -67,7 +67,7 @@ var registerTemplate = template.Must(template.ParseFiles("index.html"))
 
 func register(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
-	u := user.Current(c)
+	u := toUser(user.Current(c))
 	if u == nil {
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
@@ -82,7 +82,7 @@ func register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	g := Device{
-		UserId:         u.ID,
+		UserId:         u.UserId,
 		DeviceId:       device,
 		DeviceName:     deviceName,
 		AlertThreshold: threshold,
@@ -98,7 +98,7 @@ func register(w http.ResponseWriter, r *http.Request) {
 
 func battery(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
-	u := user.Current(c)
+	u := toUser(user.Current(c))
 	if u == nil {
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
@@ -114,7 +114,7 @@ func battery(w http.ResponseWriter, r *http.Request) {
 	t := time.Now()
 
 	b := Battery{
-		UserId:   u.ID,
+		UserId:   u.UserId,
 		DeviceId: device,
 		Battery:  int32(battery),
 		Time:     t,

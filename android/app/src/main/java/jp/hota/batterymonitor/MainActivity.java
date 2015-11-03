@@ -35,7 +35,11 @@ public class MainActivity extends AppCompatActivity {
 
     final static int REQUEST_PICK_ACCOUNT = 1;
 
-    static String PREF_ACCOUNT_NAME = "ACCOUNT_NAME";
+    final static String PREF_ACCOUNT_NAME = "ACCOUNT_NAME";
+    final static String CLIENT_ID = "server:client_id:"
+            + "546634630324-lhicestiq2l8osfobdhehi9iprgu9c3n.apps.googleusercontent.com";
+    final static String CLIENT_ID2 = "server:client_id:"
+     + "546634630324-o1b8i5jp5985tha39ob06vhhokmi04o3.apps.googleusercontent.com";
 
     static TextView textView;
     private Battery service;
@@ -51,14 +55,13 @@ public class MainActivity extends AppCompatActivity {
         textView = (TextView) findViewById(R.id.text);
 
 
-        credential = GoogleAccountCredential.usingAudience(this,
-                "server:client_id:546634630324-mkannoor781g7scn86vodbhol9qss1ev.apps.googleusercontent.com");
+        credential = GoogleAccountCredential.usingAudience(this, CLIENT_ID);
 
         startService(new Intent(this, BatteryLogger.class));
         Battery.Builder builder;
         builder = new Battery.Builder(
                 AndroidHttp.newCompatibleTransport(), new GsonFactory(), credential);
-        builder.setRootUrl("http://192.168.11.4:8080/_ah/api");
+        builder.setRootUrl("https://icumn7abiu.appspot.com/_ah/api");
         service = builder.build();
 
         // Inside your Activity class onCreate method
@@ -68,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AsyncTask<Void,Void,Void> task = new AsyncTask<Void, Void, Void>() {
+                AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
                     @Override
                     protected Void doInBackground(Void... params) {
                         List<History> histories = new ArrayList<>();
@@ -77,6 +80,9 @@ public class MainActivity extends AppCompatActivity {
                             service.battery().update(new UpdateReq().setDeviceId("1").setHistories(histories)).execute();
                             Log.d("Battery", "Success");
                         } catch (IOException e) {
+                            Log.e("Battery", credential.toString());
+                            Log.e("Battery", credential.getSelectedAccountName());
+                            Log.e("Battery", credential.getScope());
                             Log.e("Battery", "Failed to update.", e);
                         }
                         return null;
@@ -87,16 +93,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        setSelectedAccountName(settings.getString(PREF_ACCOUNT_NAME, null));
+        settings.getString(PREF_ACCOUNT_NAME, null);
 
-            chooseAccount();
+  //        if (accountName == null) {
+        chooseAccount();
+        //      } else {
+        //        credential.setSelectedAccountName(accountName);
+        this.accountName = accountName;
+//        }
     }
 
     private void chooseAccount() {
-        startActivityForResult(credential.newChooseAccountIntent(),
-                REQUEST_PICK_ACCOUNT);
+        startActivityForResult(credential.newChooseAccountIntent(), REQUEST_PICK_ACCOUNT);
     }
-
 
     private void setSelectedAccountName(String accountName) {
         SharedPreferences.Editor editor = settings.edit();
@@ -114,14 +123,9 @@ public class MainActivity extends AppCompatActivity {
             case REQUEST_PICK_ACCOUNT:
                 if (data != null && data.getExtras() != null) {
                     String accountName =
-                            data.getExtras().getString(
-                                    AccountManager.KEY_ACCOUNT_NAME);
+                            data.getExtras().getString(AccountManager.KEY_ACCOUNT_NAME);
                     if (accountName != null) {
                         setSelectedAccountName(accountName);
-                        SharedPreferences.Editor editor = settings.edit();
-                        editor.putString(PREF_ACCOUNT_NAME, accountName);
-                        editor.commit();
-                        // User is authorized.
                     }
                 }
                 break;

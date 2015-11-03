@@ -1,22 +1,18 @@
 package server
 
 import (
-	"errors"
 	"log"
 	"time"
 
 	"github.com/GoogleCloudPlatform/go-endpoints/endpoints"
 
 	"appengine/datastore"
-	"appengine/user"
 )
-
-const clientId = "546634630324-mkannoor781g7scn86vodbhol9qss1ev.apps.googleusercontent.com"
 
 var (
 	scopes    = []string{endpoints.EmailScope}
-	clientIds = []string{clientId, endpoints.APIExplorerClientID}
-	audiences = []string{clientId}
+	clientIds = []string{webClientId, androidReleaseClientId, androidDebugClientId, endpoints.APIExplorerClientID}
+	audiences = []string{webClientId, androidReleaseClientId, androidDebugClientId}
 )
 
 type BatteryService struct {
@@ -39,7 +35,7 @@ func (s *BatteryService) Update(c endpoints.Context, r *UpdateReq) error {
 	}
 
 	d := Device{
-		UserId:         u.ID,
+		UserId:         u.UserId,
 		DeviceId:       r.DeviceId,
 		DeviceName:     r.DeviceId,
 		AlertThreshold: 15,
@@ -53,7 +49,7 @@ func (s *BatteryService) Update(c endpoints.Context, r *UpdateReq) error {
 
 	for _, h := range r.Histories {
 		b := Battery{
-			UserId:   u.ID,
+			UserId:   u.UserId,
 			DeviceId: r.DeviceId,
 			Battery:  h.Level,
 			Time:     h.Time,
@@ -84,19 +80,24 @@ func (s *BatteryService) Read(c endpoints.Context, req *ReadReq) (*ReadResp, err
 	return resp, nil
 }
 
-// getCurrentUser retrieves a user associated with the request.
-// If there's no user (e.g. no auth info present in the request) returns
-// an "unauthorized" error.
-func getCurrentUser(c endpoints.Context) (*user.User, error) {
-	u, err := endpoints.CurrentUser(c, scopes, audiences, clientIds)
+type HelloReq struct {
+	Message string
+}
+
+type HelloResp struct {
+	Response string
+}
+
+// Hello world
+func (s *BatteryService) Hello(c endpoints.Context, req *HelloReq) (*HelloResp, error) {
+	u, err := getCurrentUser(c)
 	if err != nil {
 		return nil, err
 	}
-	if u == nil {
-		return nil, errors.New("Unauthorized: Please, sign in.")
+	resp := HelloResp{
+		Response: "Hello, " + u.UserId + ". Your message is " + req.Message,
 	}
-	c.Debugf("Current user: %#v", u)
-	return u, nil
+	return &resp, nil
 }
 
 func init() {
@@ -116,6 +117,7 @@ func init() {
 		i.Name, i.HTTPMethod, i.Path, i.Desc = name, method, path, desc
 	}
 
-	register("Update", "battery.update", "POST", "battery", "Update battery history.")
+	register("Update", "update", "POST", "battery", "Update battery history.")
+	register("Hello", "hello", "GET", "battery", "Hello battery history.")
 	endpoints.HandleHTTP()
 }
