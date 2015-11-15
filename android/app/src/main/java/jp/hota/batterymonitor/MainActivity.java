@@ -3,6 +3,7 @@ package jp.hota.batterymonitor;
 import android.accounts.AccountManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -14,11 +15,12 @@ import android.widget.TextView;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 
+import java.net.URL;
+
 
 public class MainActivity extends AppCompatActivity {
 
     final static int REQUEST_PICK_ACCOUNT = 1;
-
 
     final static String PREF_ACCOUNT_NAME = "ACCOUNT_NAME";
     final static String CLIENT_ID = "server:client_id:"
@@ -63,6 +65,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        findViewById(R.id.button3).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(BatteryChangeReceiver.URL)));
+            }
+        });
+
         accountName = settings.getString(PREF_ACCOUNT_NAME, null);
         if (accountName != null) {
             accountButton.setText(accountName);
@@ -79,7 +88,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case REQUEST_PICK_ACCOUNT:

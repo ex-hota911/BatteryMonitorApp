@@ -27,6 +27,8 @@ import java.util.Date;
 public class BatteryChangeReceiver extends BroadcastReceiver {
 
     final static String CLIENT_ID = MainActivity.CLIENT_ID;
+    public static final String URL = "https://icumn7abiu.appspot.com/";
+    public static final String API_ROOT = URL + "_ah/api";
 
     static String PREF_ACCOUNT_NAME = "ACCOUNT_NAME";
     private static GoogleAccountCredential credential;
@@ -62,7 +64,7 @@ public class BatteryChangeReceiver extends BroadcastReceiver {
 
         builder = new Battery.Builder(
                 AndroidHttp.newCompatibleTransport(), new GsonFactory(), credential);
-        builder.setRootUrl("https://icumn7abiu.appspot.com/_ah/api");
+        builder.setRootUrl(API_ROOT);
         final Battery service = builder.build();
 
         Log.d(BatteryChangeReceiver.class.getName(), "" + level);
@@ -70,7 +72,6 @@ public class BatteryChangeReceiver extends BroadcastReceiver {
         if (MainActivity.textView != null) {
             MainActivity.textView.setText("" + level);
         }
-        Toast.makeText(context, "" + level, Toast.LENGTH_SHORT).show();
 
         if (level < 0) {
             return;
