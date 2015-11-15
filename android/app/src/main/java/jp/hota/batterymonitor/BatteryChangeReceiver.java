@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.BatteryManager;
+import android.os.Build;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
@@ -28,16 +29,32 @@ public class BatteryChangeReceiver extends BroadcastReceiver {
     final static String CLIENT_ID = MainActivity.CLIENT_ID;
 
     static String PREF_ACCOUNT_NAME = "ACCOUNT_NAME";
-
+    private static GoogleAccountCredential credential;
 
     public void onReceive(Context context, Intent intent) {
 
-        GoogleAccountCredential credential =
+        int currentLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+        int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+
+        if (currentLevel < 0 || scale <= 0) {
+            return;
+        }
+
+        int level = (currentLevel * 100) / scale;
+
+        update(context, level);
+    }
+
+    public static void update(Context context, int level) {
+        credential =
                 GoogleAccountCredential.usingAudience(context, CLIENT_ID);
 
         SharedPreferences settings = context.getSharedPreferences("BatteryMonitor", 0);
-        String accountName = "hiroyuki.ot@gmail.com";
-        //String accountName = settings.getString(PREF_ACCOUNT_NAME, null);
+        String accountName = settings.getString(PREF_ACCOUNT_NAME, null);
+        if (accountName == null) {
+            // TODO: Show notification to select account.
+            return;
+        }
 
         credential.setSelectedAccountName(accountName);
 
@@ -48,19 +65,7 @@ public class BatteryChangeReceiver extends BroadcastReceiver {
         builder.setRootUrl("https://icumn7abiu.appspot.com/_ah/api");
         final Battery service = builder.build();
 
-
-        int currentLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-        int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-
-        if (currentLevel < 0 || scale <= 0) {
-            Log.d(getClass().getName(),
-                    "currentLevel:" + currentLevel + " scale:" + scale);
-            return;
-        }
-
-        int level = (currentLevel * 100) / scale;
-
-        Log.d(this.getClass().getName(), "" + level);
+        Log.d(BatteryChangeReceiver.class.getName(), "" + level);
         MainActivity.level = level;
         if (MainActivity.textView != null) {
             MainActivity.textView.setText("" + level);
@@ -76,12 +81,13 @@ public class BatteryChangeReceiver extends BroadcastReceiver {
         String androidId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
         final UpdateReq req = new UpdateReq()
                 .setDeviceId(androidId)
+                .setDeviceName(Build.MODEL)
                 .setHistories(ImmutableList.of(history));
         AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    service.battery().update(req).execute();
+                    service.update(req).execute();
                     Log.d(getClass().getName(), "Success");
                 } catch (IOException e) {
                     Log.e(getClass().getName(), "Failed to update.", e);
