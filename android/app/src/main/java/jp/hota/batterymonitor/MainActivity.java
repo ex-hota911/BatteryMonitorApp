@@ -15,8 +15,6 @@ import android.widget.TextView;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 
-import java.net.URL;
-
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         textView = (TextView) findViewById(R.id.text);
         accountButton = (Button) findViewById(R.id.button2);
 
-        startService(new Intent(this, BatteryLogger.class));
+        startService(new Intent(this, BatteryService.class));
 
         // Inside your Activity class onCreate method
         settings = getSharedPreferences("BatteryMonitor", 0);
@@ -54,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
                 if (level < 0) {
                     return;
                 }
-                BatteryChangeReceiver.update(v.getContext(), level);
+                BatteryChangeReceiver.update(v.getContext(), level, null);
             }
         });
 

@@ -8,8 +8,8 @@ import android.os.AsyncTask;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.provider.Settings;
+import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.appspot.icumn7abiu.battery.Battery;
 import com.appspot.icumn7abiu.battery.model.History;
@@ -34,7 +34,6 @@ public class BatteryChangeReceiver extends BroadcastReceiver {
     private static GoogleAccountCredential credential;
 
     public void onReceive(Context context, Intent intent) {
-
         int currentLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
         int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
 
@@ -43,11 +42,10 @@ public class BatteryChangeReceiver extends BroadcastReceiver {
         }
 
         int level = (currentLevel * 100) / scale;
-
-        update(context, level);
+        update(context, level, goAsync());
     }
 
-    public static void update(Context context, int level) {
+    public static void update(Context context, int level, @Nullable final PendingResult result) {
         credential =
                 GoogleAccountCredential.usingAudience(context, CLIENT_ID);
 
@@ -84,6 +82,7 @@ public class BatteryChangeReceiver extends BroadcastReceiver {
                 .setDeviceId(androidId)
                 .setDeviceName(Build.MODEL)
                 .setHistories(ImmutableList.of(history));
+
         AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -92,6 +91,9 @@ public class BatteryChangeReceiver extends BroadcastReceiver {
                     Log.d(getClass().getName(), "Success");
                 } catch (IOException e) {
                     Log.e(getClass().getName(), "Failed to update.", e);
+                }
+                if (result != null) {
+                    result.finish();
                 }
                 return null;
             }
