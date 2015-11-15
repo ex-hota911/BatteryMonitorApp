@@ -20,8 +20,9 @@ function drawChart(d, id) {
     }
     var options = {
         title: 'Battery (%)',
-        curveType: 'function',
-        legend: { position: 'bottom' }
+        // curveType: 'function',
+        legend: { position: 'bottom' },
+		// TODO(hota): Set max and min of the graph.
     };
     var chart = new google.visualization.LineChart(document.getElementById(id));
     chart.draw(data, options);

@@ -4,46 +4,41 @@ import android.accounts.AccountManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.appspot.icumn7abiu.battery.Battery;
 import com.appspot.icumn7abiu.battery.model.History;
 import com.appspot.icumn7abiu.battery.model.UpdateReq;
-import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.DateTime;
-import com.google.android.gms.common.AccountPicker;
+import com.google.common.collect.ImmutableList;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
 
     final static int REQUEST_PICK_ACCOUNT = 1;
 
+
     final static String PREF_ACCOUNT_NAME = "ACCOUNT_NAME";
     final static String CLIENT_ID = "server:client_id:"
-            + "546634630324-lhicestiq2l8osfobdhehi9iprgu9c3n.apps.googleusercontent.com";
-    final static String CLIENT_ID2 = "server:client_id:"
-     + "546634630324-o1b8i5jp5985tha39ob06vhhokmi04o3.apps.googleusercontent.com";
+            + "546634630324-mkannoor781g7scn86vodbhol9qss1ev.apps.googleusercontent.com";
 
+    static int level = -1;
     static TextView textView;
     private Battery service;
     private Button button;
+    private Button accountButton;
     private SharedPreferences settings;
     private GoogleAccountCredential credential;
     private String accountName;
@@ -53,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         textView = (TextView) findViewById(R.id.text);
-
+        accountButton = (Button) findViewById(R.id.button2);
 
         credential = GoogleAccountCredential.usingAudience(this, CLIENT_ID);
 
@@ -67,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
         // Inside your Activity class onCreate method
         settings = getSharedPreferences("BatteryMonitor", 0);
 
+        final String androidId = Settings.Secure.getString(MainActivity.this.getContentResolver(), Settings.Secure.ANDROID_ID);
+
         button = (Button) findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,15 +71,19 @@ public class MainActivity extends AppCompatActivity {
                 AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
                     @Override
                     protected Void doInBackground(Void... params) {
-                        List<History> histories = new ArrayList<>();
-                        histories.add(new History().setLevel(10).setTimestamp(new DateTime(new Date())));
+                        if (level < 0) {
+                            return null;
+                        }
+                        History history = new History()
+                                .setLevel(level)
+                                .setTimestamp((new DateTime(new Date())));
+                        UpdateReq req = new UpdateReq()
+                                .setDeviceId(androidId                               )
+                                .setHistories(ImmutableList.of(history));
                         try {
-                            service.battery().update(new UpdateReq().setDeviceId("1").setHistories(histories)).execute();
+                            service.battery().update(req).execute();
                             Log.d("Battery", "Success");
                         } catch (IOException e) {
-                            Log.e("Battery", credential.toString());
-                            Log.e("Battery", credential.getSelectedAccountName());
-                            Log.e("Battery", credential.getScope());
                             Log.e("Battery", "Failed to update.", e);
                         }
                         return null;
