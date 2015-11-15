@@ -9,8 +9,8 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
-public class BatteryLogger extends Service {
-    static final String TAG = "BatteryLogger";
+public class BatteryService extends Service {
+    static final String TAG = "BatteryService";
     BatteryChangeReceiver mReceiver;
 
     @Override
