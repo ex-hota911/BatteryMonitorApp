@@ -3,10 +3,14 @@
   "description": "Make the current page red",
   "version": "2.0",
   "permissions": [
-    "activeTab"
+    "activeTab", "alarms", "identity"
   ],
+  "oauth2": {
+    "client_id": "546634630324-5cu4mgk7vmnpe2jhb2ouhmo8m3h84pnb.apps.googleusercontent.com",
+    "scopes": ["https://www.googleapis.com/auth/userinfo.email"]
+  },
   "background": {
-    "scripts": ["background.js"],
+    "scripts": ["background.js", "gapi-chrome-apps.js"],
     "persistent": false
   },
   "browser_action": {
