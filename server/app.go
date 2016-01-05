@@ -31,11 +31,17 @@ func root(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusFound)
 		return
 	}
+	var err error
+	logoutUrl, err := user.LogoutURL(c, r.URL.String())
+	if err != nil {
+		c.Errorf(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	q := datastore.NewQuery("Device").Ancestor(userKey(u, c)).Order("DeviceName")
 	devices := []Device{}
 	keys := []*datastore.Key{}
-	var err error
 	if keys, err = q.GetAll(c, &devices); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -56,6 +62,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 		"User":           u,
 		"Devices":        devices,
 		"BatteryHistory": history,
+		"LogoutUrl":      logoutUrl,
 	}
 
 	if err := registerTemplate.Execute(w, &data); err != nil {

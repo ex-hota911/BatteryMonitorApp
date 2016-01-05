@@ -19,8 +19,9 @@ type BatteryService struct {
 }
 
 type UpdateReq struct {
-	DeviceId  string
-	Histories []History
+	DeviceId   string
+	DeviceName string
+	Histories  []History
 }
 
 type History struct {
@@ -34,10 +35,15 @@ func (s *BatteryService) Update(c endpoints.Context, r *UpdateReq) error {
 		return err
 	}
 
+	name := r.DeviceId
+	if r.DeviceName != "" {
+		name = r.DeviceName
+	}
+
 	d := Device{
 		UserId:         u.UserId,
 		DeviceId:       r.DeviceId,
-		DeviceName:     r.DeviceId,
+		DeviceName:     name,
 		AlertThreshold: 15,
 	}
 	c.Debugf("%#v", deviceKey(u, d.DeviceId, c))

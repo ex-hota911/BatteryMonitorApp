@@ -18,8 +18,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".BatteryLogger"/>
-        <receiver android:name=".BatteryLogger$BatteryLoggerStarter">
+        <service android:name=".BatteryService"/>
+        <receiver android:name=".BatteryService$BatteryLoggerStarter">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>

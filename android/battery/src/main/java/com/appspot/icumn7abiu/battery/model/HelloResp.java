@@ -19,7 +19,7 @@
 package com.appspot.icumn7abiu.battery.model;
 
 /**
- * Model definition for History.
+ * Model definition for HelloResp.
  *
  * <p> This is the Java data model class that specifies how to parse/serialize into the JSON that is
  * transmitted over HTTP when working with the battery. For a detailed explanation see:
@@ -29,58 +29,37 @@ package com.appspot.icumn7abiu.battery.model;
  * @author Google, Inc.
  */
 @SuppressWarnings("javadoc")
-public final class History extends com.google.api.client.json.GenericJson {
+public final class HelloResp extends com.google.api.client.json.GenericJson {
 
   /**
    * The value may be {@code null}.
    */
-  @com.google.api.client.util.Key
-  private java.lang.Integer level;
-
-  /**
-   * The value may be {@code null}.
-   */
-  @com.google.api.client.util.Key
-  private com.google.api.client.util.DateTime timestamp;
+  @com.google.api.client.util.Key("Response")
+  private java.lang.String response;
 
   /**
    * @return value or {@code null} for none
    */
-  public java.lang.Integer getLevel() {
-    return level;
+  public java.lang.String getResponse() {
+    return response;
   }
 
   /**
-   * @param level level or {@code null} for none
+   * @param response response or {@code null} for none
    */
-  public History setLevel(java.lang.Integer level) {
-    this.level = level;
-    return this;
-  }
-
-  /**
-   * @return value or {@code null} for none
-   */
-  public com.google.api.client.util.DateTime getTimestamp() {
-    return timestamp;
-  }
-
-  /**
-   * @param timestamp timestamp or {@code null} for none
-   */
-  public History setTimestamp(com.google.api.client.util.DateTime timestamp) {
-    this.timestamp = timestamp;
+  public HelloResp setResponse(java.lang.String response) {
+    this.response = response;
     return this;
   }
 
   @Override
-  public History set(String fieldName, Object value) {
-    return (History) super.set(fieldName, value);
+  public HelloResp set(String fieldName, Object value) {
+    return (HelloResp) super.set(fieldName, value);
   }
 
   @Override
-  public History clone() {
-    return (History) super.clone();
+  public HelloResp clone() {
+    return (HelloResp) super.clone();
   }
 
 }

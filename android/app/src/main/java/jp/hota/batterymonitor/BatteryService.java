@@ -9,14 +9,13 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
-public class BatteryLogger extends Service {
-    static final String TAG = "BatteryLogger";
+public class BatteryService extends Service {
+    static final String TAG = "BatteryService";
     BatteryChangeReceiver mReceiver;
 
     @Override
     public void onCreate() {
         Log.i(TAG, "onCreate");
-        Toast.makeText(this, "MyService#onCreate", Toast.LENGTH_SHORT).show();
 
         mReceiver = new BatteryChangeReceiver();
         registerReceiver(mReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
@@ -25,7 +24,6 @@ public class BatteryLogger extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand Received start id " + startId + ": " + intent);
-        Toast.makeText(this, "MyService#onStartCommand", Toast.LENGTH_SHORT).show();
 
         return START_STICKY;
     }
@@ -33,7 +31,6 @@ public class BatteryLogger extends Service {
     @Override
     public void onDestroy() {
         Log.i(TAG, "onDestroy");
-        Toast.makeText(this, "MyService#onDestroy", Toast.LENGTH_SHORT).show();
 
         unregisterReceiver(mReceiver);
     }

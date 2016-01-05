@@ -4,7 +4,7 @@
   </head>
   <body>
 	<h2>Battery Monitor</h2>
-	<div>Hello, {{.User.UserId}}.</div>
+	<div>Hello, {{.User.UserId}}. <a href={{.LogoutUrl}}>logout</a></div>
 
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript">
@@ -14,18 +14,12 @@
     </script>
 	<div>Devices</div>
 	<table border=1>
-  	  <tr>
-		<td>Device Name</td>
-		<td>Device ID</td>
-		<td>Alert Threshold</td>
-		<td>Battery</td>
-	  </tr>
 	{{range $index, $device := .Devices}}
   	  <tr>
-		<td> {{$device.DeviceName}} </td>
-		<td> {{$device.DeviceId}} </td>
-		<td> {{$device.AlertThreshold}} </td>
-		<td> <div id="chart_{{$index}}" style="width: 900px; height: 500px"></div></td>
+		<td> {{$device.DeviceName}} ({{$device.DeviceId}}) </td>
+	  </tr>
+	  <tr>
+		<td><div id="chart_{{$index}}" style="width: 600px; height: 300px"></div></td>
 	  </tr>
 	{{end}}
 	</table>

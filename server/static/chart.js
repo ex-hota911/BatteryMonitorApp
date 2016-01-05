@@ -20,8 +20,15 @@ function drawChart(d, id) {
     }
     var options = {
         title: 'Battery (%)',
-        curveType: 'function',
-        legend: { position: 'bottom' }
+        // curveType: 'function',
+        legend: { position: 'bottom' },
+		vAxis: {
+			viewWindowMode: 'explicit',
+			viewWindow: {
+				min: 0,
+				max: 100,
+			}
+		}
     };
     var chart = new google.visualization.LineChart(document.getElementById(id));
     chart.draw(data, options);
