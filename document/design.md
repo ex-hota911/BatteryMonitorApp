@@ -1,39 +1,60 @@
 # Battery Monitor
 
-## Tables
+## Objective
+
+Alert users before their devices batteries die.
+
+## Overview
+
+Android app and Chrome app periodically reports device battery level to the server. When battery level is less than threshold, an alert is sent to other devices.
+
+## Detailed Design
+
+### Tables
+
++ User
+  + Device
+    + Battery
 
 *User*
 
-+ (PK) user_id: string
++ (PK) UserId: string
   + email address
 
 *Device*
 
-+ (PK) device_id: string
-+ device name: string
-+ alert threshold: int
++ (PK) UserId: string
++ (PK) DeviceId: string
++ DeviceName: string
++ AlertThreshold: int
   + 0 to 100
-+ (optional) history: []Battery
-  + Used only for API
 
 *Battery*
 
-+ (PK) time: time
++ (PK) UserId: string
++ (PK) DeviceId: string
++ (PK) Time: time
 + battery: int
 
-## API
+### API
 
 *Update*
 
+Updates or register device and its battery history.
+
 + Request
-  + devices: []Device
+  + device: Device
     + (required) device_id
-	+ history: []Battery
-	  + (required) battery
-	  + (optional) time
+    + (optional) device_name
+    + (optional) alert_threshold
+  	+ history: []Battery
+	    + (required) battery
+  	  + (optional) time
 + Response
 
 *List*
+
+Lists devices and battery history.
 
 + Request
   + (optional) device_id: string
@@ -41,6 +62,3 @@
   + (optional) end_date: time
 + Response
   + devices: []Device
-
-
-
