@@ -19,9 +19,7 @@ type BatteryService struct {
 }
 
 type UpdateReq struct {
-	DeviceId   string
-	DeviceName string
-	Histories  []History
+	Device Device
 }
 
 type History struct {
@@ -35,17 +33,8 @@ func (s *BatteryService) Update(c endpoints.Context, r *UpdateReq) error {
 		return err
 	}
 
-	name := r.DeviceId
-	if r.DeviceName != "" {
-		name = r.DeviceName
-	}
-
-	d := Device{
-		UserId:         u.UserId,
-		DeviceId:       r.DeviceId,
-		DeviceName:     name,
-		AlertThreshold: 15,
-	}
+	// Store Device
+	d := r.Device
 	c.Debugf("%#v", deviceKey(u, d.DeviceId, c))
 	_, err = datastore.Put(c, deviceKey(u, d.DeviceId, c), &d)
 	if err != nil {
@@ -53,15 +42,10 @@ func (s *BatteryService) Update(c endpoints.Context, r *UpdateReq) error {
 		return err
 	}
 
-	for _, h := range r.Histories {
-		b := Battery{
-			UserId:   u.UserId,
-			DeviceId: r.DeviceId,
-			Battery:  h.Level,
-			Time:     h.Time,
-		}
-		c.Debugf("%#v", batteryKey(u, b.DeviceId, b.Time, c))
-		_, err = datastore.Put(c, batteryKey(u, b.DeviceId, b.Time, c), &b)
+	// Store Histories
+	for _, b := range r.Device.Batteries {
+		c.Debugf("%#v", batteryKey(u, d.DeviceId, b.Time, c))
+		_, err = datastore.Put(c, batteryKey(u, d.DeviceId, b.Time, c), &b)
 		if err != nil {
 			c.Debugf("%#v", err)
 			return err
@@ -86,6 +70,7 @@ func (s *BatteryService) Read(c endpoints.Context, req *ReadReq) (*ReadResp, err
 	return resp, nil
 }
 
+// Hello world
 type HelloReq struct {
 	Message string
 }
@@ -94,7 +79,6 @@ type HelloResp struct {
 	Response string
 }
 
-// Hello world
 func (s *BatteryService) Hello(c endpoints.Context, req *HelloReq) (*HelloResp, error) {
 	u, err := getCurrentUser(c)
 	if err != nil {

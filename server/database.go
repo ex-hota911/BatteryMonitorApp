@@ -12,24 +12,22 @@ import (
 )
 
 type User struct {
-	UserId string
+	UserId string `datastore:"-"` // User.ID
 }
 
 type Device struct {
-	UserId         string // User.ID
-	DeviceId       string // Unique ID for a device
+	UserId         string `datastore:"-"` // User.ID
+	DeviceId       string `datastore:"-"` // Unique ID for a device
 	DeviceName     string // Display name.
 	AlertThreshold int32  // 0 - 100.
 
-	// Not stored.
-	Batteries []Battery
+	// For API
+	Batteries []Battery `database:"-"`
 }
 
 type Battery struct {
-	UserId   string    `json:"-"`
-	DeviceId string    `json:"-"`
-	Battery  int32     `json:"battery"` // 0 - 100.
-	Time     time.Time `json:"time"`    // timestamp
+	Time    time.Time `json:"time" datastore:"-"` // timestamp
+	Battery int32     `json:"battery"`            // 0 - 100.
 }
 
 func userKey(u *User, c appengine.Context) *datastore.Key {
@@ -46,6 +44,10 @@ func batteryKey(u *User, d string, t time.Time, c appengine.Context) *datastore.
 	dk := deviceKey(u, d, c)
 	c.Debugf("%#v", dk)
 	return datastore.NewKey(c, "Battery", "", t.Unix(), dk)
+}
+
+func populateKey(k *datastore.Key, b *Battery) {
+	b.Time = time.Unix(k.IntID(), 0)
 }
 
 // getCurrentUser retrieves a user associated with the request.

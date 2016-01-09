@@ -51,9 +51,13 @@ func root(w http.ResponseWriter, r *http.Request) {
 	for _, key := range keys {
 		qb := datastore.NewQuery("Battery").Ancestor(key).Order("-__key__")
 		h := []Battery{}
-		if _, err := qb.GetAll(c, &h); err != nil {
+		keys, err := qb.GetAll(c, &h)
+		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
+		}
+		for i, k := range keys {
+			populateKey(k, &h[i])
 		}
 		history = append(history, h)
 	}
@@ -121,10 +125,8 @@ func battery(w http.ResponseWriter, r *http.Request) {
 	t := time.Now()
 
 	b := Battery{
-		UserId:   u.UserId,
-		DeviceId: device,
-		Battery:  int32(battery),
-		Time:     t,
+		Battery: int32(battery),
+		Time:    t,
 	}
 
 	_, err = datastore.Put(c, batteryKey(u, device, t, c), &b)
