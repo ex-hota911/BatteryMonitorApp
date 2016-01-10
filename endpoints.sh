@@ -2,7 +2,7 @@
 
 set -exu
 
-API="battery"
+API="batteryservice"
 URL="https://icumn7abiu.appspot.com/_ah/api/discovery/v1/apis/${API}/v1/rest"
 curl -s $URL > ${API}.rest.discovery
 
