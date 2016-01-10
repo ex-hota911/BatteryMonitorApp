@@ -42,7 +42,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 	q := datastore.NewQuery("Device").Ancestor(userKey(u, c)).Order("DeviceName")
 	devices := []Device{}
 	keys := []*datastore.Key{}
-	if keys, err = q.GetAll(c, &devices); err != nil {
+	if keys, err = q.GetAll(c, &devices); err != nil && !isErrFieldMismatch(err) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -52,7 +52,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 		qb := datastore.NewQuery("Battery").Ancestor(key).Order("-__key__")
 		h := []Battery{}
 		keys, err := qb.GetAll(c, &h)
-		if err != nil {
+		if err != nil && !isErrFieldMismatch(err) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -72,6 +72,12 @@ func root(w http.ResponseWriter, r *http.Request) {
 	if err := registerTemplate.Execute(w, &data); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+}
+
+// isErrFieldMismatch returns whether err is a datastore.ErrFieldMismatch.
+func isErrFieldMismatch(err error) bool {
+	_, ok := err.(*datastore.ErrFieldMismatch)
+	return ok
 }
 
 var registerTemplate = template.Must(template.ParseFiles("index.html"))
