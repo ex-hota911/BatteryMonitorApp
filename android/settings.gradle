@@ -1,1 +1,2 @@
-include ':app', ':battery'
+include ':app'
+include ':batteryservice'

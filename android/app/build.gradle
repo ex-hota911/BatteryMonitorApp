@@ -33,5 +33,5 @@ dependencies {
     //compile 'com.google.api-client:google-api-client-android:1.17.0-rc'
     compile([group: 'com.google.api-client', name: 'google-api-client-android', version: '1.20.0'])
     compile([group: 'com.google.http-client', name: 'google-http-client-gson', version: '1.20.0'])
-    compile project(':battery')
+    compile project(':batteryservice')
 }

@@ -11,9 +11,10 @@ import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.appspot.icumn7abiu.battery.Battery;
-import com.appspot.icumn7abiu.battery.model.History;
-import com.appspot.icumn7abiu.battery.model.UpdateReq;
+import com.appspot.icumn7abiu.batteryservice.model.Battery;
+import com.appspot.icumn7abiu.batteryservice.Batteryservice;
+import com.appspot.icumn7abiu.batteryservice.model.Device;
+import com.appspot.icumn7abiu.batteryservice.model.UpdateReq;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.json.gson.GsonFactory;
@@ -58,12 +59,10 @@ public class BatteryChangeReceiver extends BroadcastReceiver {
 
         credential.setSelectedAccountName(accountName);
 
-        Battery.Builder builder;
-
-        builder = new Battery.Builder(
+        Batteryservice.Builder builder = new Batteryservice.Builder(
                 AndroidHttp.newCompatibleTransport(), new GsonFactory(), credential);
         builder.setRootUrl(API_ROOT);
-        final Battery service = builder.build();
+        final Batteryservice service = builder.build();
 
         Log.d(BatteryChangeReceiver.class.getName(), "" + level);
         MainActivity.level = level;
@@ -74,14 +73,17 @@ public class BatteryChangeReceiver extends BroadcastReceiver {
         if (level < 0) {
             return;
         }
-        History history = new History()
-                .setLevel(level)
-                .setTimestamp((new DateTime(new Date())));
+
+        Battery battery = new Battery()
+                .setBattery(level)
+                .setTime(new DateTime(new Date()));
         String androidId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
-        final UpdateReq req = new UpdateReq()
+        Device device = new Device()
                 .setDeviceId(androidId)
                 .setDeviceName(Build.MODEL)
-                .setHistories(ImmutableList.of(history));
+                .setBatteries(ImmutableList.of(battery));
+        final UpdateReq req = new UpdateReq()
+                .setDevice(device);
 
         AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
             @Override
