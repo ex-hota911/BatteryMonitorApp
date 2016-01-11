@@ -6,4 +6,6 @@ const (
 	androidDebugClientId   = ""
 
 	gcmApplicationKey = ""
+
+	myNexus5x = ""
 )

@@ -71,6 +71,13 @@ func root(w http.ResponseWriter, r *http.Request) {
 
 	if err := registerTemplate.Execute(w, &data); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = notify(c)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 }
 
