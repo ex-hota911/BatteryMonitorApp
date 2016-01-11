@@ -4,4 +4,6 @@ const (
 	webClientId            = ""
 	androidReleaseClientId = ""
 	androidDebugClientId   = ""
+
+	gcmApplicationKey = ""
 )
