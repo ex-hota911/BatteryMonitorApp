@@ -1,6 +1,7 @@
 package jp.hota.batterymonitor;
 
 import android.accounts.AccountManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -15,7 +16,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.android.gms.iid.InstanceID;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+
+import java.io.IOException;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -36,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(getClass().getName(), "onCreate");
         setContentView(R.layout.activity_main);
         textView = (TextView) findViewById(R.id.text);
         accountButton = (Button) findViewById(R.id.button2);
@@ -79,12 +85,20 @@ public class MainActivity extends AppCompatActivity {
             chooseAccount();
         }
         Log.d(this.getClass().getName(), Build.MODEL);
+
+
+        Log.d(this.getClass().getName(), "Start registering GCM");
+        // Start IntentService to register this application with GCM.
+        Intent intent = new Intent(this, RegistrationIntentService.class);
+        startService(intent);
     }
 
     private void chooseAccount() {
         startActivityForResult(GoogleAccountCredential.usingAudience(this, CLIENT_ID).newChooseAccountIntent(),
                 REQUEST_PICK_ACCOUNT);
     }
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

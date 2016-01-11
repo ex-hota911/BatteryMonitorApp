@@ -61,7 +61,7 @@ public class BatteryChangeReceiver extends BroadcastReceiver {
 
         Batteryservice.Builder builder = new Batteryservice.Builder(
                 AndroidHttp.newCompatibleTransport(), new GsonFactory(), credential);
-        builder.setRootUrl(API_ROOT);
+        builder.setRootUrl(API_ROOT).setApplicationName("AndroidApp");
         final Batteryservice service = builder.build();
 
         Log.d(BatteryChangeReceiver.class.getName(), "" + level);

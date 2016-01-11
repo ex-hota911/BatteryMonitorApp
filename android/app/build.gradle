@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 22
@@ -26,8 +27,8 @@ android {
 
 dependencies {
     //compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:appcompat-v7:22.2.0'
-    compile 'com.google.android.gms:play-services:7.5.0'
+    compile 'com.android.support:appcompat-v7:22.1.0'
+    compile 'com.google.android.gms:play-services:8.3.0'
     //compile 'com.google.apis:google-api-services-oauth2:v2-rev51-1.17.0-rc'
     //compile 'com.google.api-client:google-api-client:1.17.0-rc'
     //compile 'com.google.api-client:google-api-client-android:1.17.0-rc'

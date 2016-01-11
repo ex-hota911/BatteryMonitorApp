@@ -1,0 +1,59 @@
+{
+  "project_info": {
+    "project_id": "icumn7abiu",
+    "project_number": "546634630324",
+    "name": "battery monitor"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:546634630324:android:a1bbf31535fbda31",
+        "client_id": "android:jp.hota.batterymonitor",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "jp.hota.batterymonitor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "546634630324-o1b8i5jp5985tha39ob06vhhokmi04o3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "jp.hota.batterymonitor",
+            "certificate_hash": "D04FF191DAF931B7BBE1068B9A9B3FFBEE730D19"
+          }
+        },
+        {
+          "client_id": "546634630324-lhicestiq2l8osfobdhehi9iprgu9c3n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "jp.hota.batterymonitor",
+            "certificate_hash": "EC03AF6059BBA1EF3D61D680CE111CB8E7FA31E8"
+          }
+        }
+      ],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 2,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 1
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}
