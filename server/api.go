@@ -92,8 +92,7 @@ func (s *BatteryService) Hello(c endpoints.Context, req *HelloReq) (*HelloResp, 
 
 func init() {
 	service := &BatteryService{}
-	api, err := endpoints.RegisterService(service,
-		"battery", "v1", "Battery API", true)
+	api, err := endpoints.RegisterService(service, "", "v1", "Battery API", true)
 	if err != nil {
 		log.Fatalf("Register service: %v", err)
 	}
