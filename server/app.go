@@ -6,9 +6,10 @@ import (
 	"strconv"
 	"time"
 
-	"appengine"
-	"appengine/datastore"
-	"appengine/user"
+	"google.golang.org/appengine"
+	"google.golang.org/appengine/datastore"
+	"google.golang.org/appengine/log"
+	"google.golang.org/appengine/user"
 )
 
 func init() {
@@ -23,7 +24,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 	if u == nil {
 		url, err := user.LoginURL(c, r.URL.String())
 		if err != nil {
-			c.Errorf(err.Error())
+			log.Errorf(c, err.Error())
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -34,7 +35,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 	var err error
 	logoutUrl, err := user.LogoutURL(c, r.URL.String())
 	if err != nil {
-		c.Errorf(err.Error())
+		log.Errorf(c, err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

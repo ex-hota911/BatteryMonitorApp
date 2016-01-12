@@ -6,8 +6,8 @@ import (
 	"log"
 	"net/http"
 
-	"appengine"
-	"appengine/urlfetch"
+	"golang.org/x/net/context"
+	"google.golang.org/appengine/urlfetch"
 )
 
 // curl -X POST \
@@ -32,7 +32,7 @@ type Data struct {
 	Level  int    `json:"level"`
 }
 
-func notify(ctx appengine.Context) error {
+func notify(ctx context.Context) error {
 	body, err := json.Marshal(PostData{
 		Notification: Notification{},
 		Data:         Data{},

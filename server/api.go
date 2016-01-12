@@ -1,12 +1,14 @@
 package server
 
 import (
-	"log"
+	logger "log"
 	"time"
 
 	"github.com/GoogleCloudPlatform/go-endpoints/endpoints"
+	"golang.org/x/net/context"
 
-	"appengine/datastore"
+	"google.golang.org/appengine/datastore"
+	"google.golang.org/appengine/log"
 )
 
 var (
@@ -27,7 +29,7 @@ type History struct {
 	Time  time.Time `json:"timestamp"`
 }
 
-func (s *BatteryService) Update(c endpoints.Context, r *UpdateReq) error {
+func (s *BatteryService) Update(c context.Context, r *UpdateReq) error {
 	u, err := getCurrentUser(c)
 	if err != nil {
 		return err
@@ -35,19 +37,19 @@ func (s *BatteryService) Update(c endpoints.Context, r *UpdateReq) error {
 
 	// Store Device
 	d := r.Device
-	c.Debugf("%#v", deviceKey(u, d.DeviceId, c))
+	log.Debugf(c, "%#v", deviceKey(u, d.DeviceId, c))
 	_, err = datastore.Put(c, deviceKey(u, d.DeviceId, c), &d)
 	if err != nil {
-		c.Debugf("%#v", err)
+		log.Debugf(c, "%#v", err)
 		return err
 	}
 
 	// Store Histories
 	for _, b := range r.Device.Batteries {
-		c.Debugf("%#v", batteryKey(u, d.DeviceId, b.Time, c))
+		log.Debugf(c, "%#v", batteryKey(u, d.DeviceId, b.Time, c))
 		_, err = datastore.Put(c, batteryKey(u, d.DeviceId, b.Time, c), &b)
 		if err != nil {
-			c.Debugf("%#v", err)
+			log.Debugf(c, "%#v", err)
 			return err
 		}
 	}
@@ -60,7 +62,7 @@ type ReadReq struct {
 type ReadResp struct {
 }
 
-func (s *BatteryService) Read(c endpoints.Context, req *ReadReq) (*ReadResp, error) {
+func (s *BatteryService) Read(c context.Context, req *ReadReq) (*ReadResp, error) {
 	u, err := getCurrentUser(c)
 	if err != nil {
 		return nil, err
@@ -79,7 +81,7 @@ type HelloResp struct {
 	Response string
 }
 
-func (s *BatteryService) Hello(c endpoints.Context, req *HelloReq) (*HelloResp, error) {
+func (s *BatteryService) Hello(c context.Context, req *HelloReq) (*HelloResp, error) {
 	u, err := getCurrentUser(c)
 	if err != nil {
 		return nil, err
@@ -94,13 +96,13 @@ func init() {
 	service := &BatteryService{}
 	api, err := endpoints.RegisterService(service, "", "v1", "Battery API", true)
 	if err != nil {
-		log.Fatalf("Register service: %v", err)
+		logger.Fatalf("Register service: %v", err)
 	}
 
 	register := func(orig, name, method, path, desc string) {
 		m := api.MethodByName(orig)
 		if m == nil {
-			log.Fatalf("Missing method %s", orig)
+			logger.Fatalf("Missing method %s", orig)
 		}
 		i := m.Info()
 		i.Name, i.HTTPMethod, i.Path, i.Desc = name, method, path, desc
