@@ -16,34 +16,40 @@ import (
 // -d '{"data":{"score":"3x1"}, "to": "https://gcm-http.googleapis.com/gcm/send"}' https://gcm-http.googleapis.com/gcm/send
 
 type PostData struct {
-	Notification Notification `json:"notification"`
-	Data         Data         `json:"data"`
-	To           string       `json:"to"`
+	Notification    Notification `json:"notification,omitempty"`
+	Data            Data         `json:"data,omitempty"`
+	To              string       `json:"to,omitempty"`
+	RegistrationIds []string     `json:"registration_ids,omitempty"`
+	CollapseKey     string       `json:"collapse_key,omitempty"`
 }
 
 type Notification struct {
 	Body  string `json:"body"`
 	Title string `json:"title"`
 	Icon  string `json:"icon"`
+	Tag   string `json:"tag,omitempty"`
 }
 
 type Data struct {
-	Device string `json:"device"`
-	Level  int    `json:"level"`
 }
 
-func notify(ctx context.Context) error {
-	body, err := json.Marshal(PostData{
-		Notification: Notification{},
-		Data:         Data{},
-		To:           myNexus5x,
+func notify(ctx context.Context, title, body string, to []string) error {
+	b, err := json.Marshal(PostData{
+		Notification: Notification{
+			Title: title,
+			Body:  body,
+			Icon:  "ic_battery_alert_black",
+			Tag:   "battery_low",
+		},
+		RegistrationIds: to,
+		CollapseKey:     "battery_low",
 	})
 
 	if err != nil {
 		return err
 	}
 
-	req, err := http.NewRequest("POST", "https://gcm-http.googleapis.com/gcm/send", bytes.NewReader(body))
+	req, err := http.NewRequest("POST", "https://gcm-http.googleapis.com/gcm/send", bytes.NewReader(b))
 	if err != nil {
 		return err
 	}

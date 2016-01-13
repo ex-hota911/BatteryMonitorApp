@@ -1,8 +1,8 @@
 package server
 
 import (
+	"fmt"
 	logger "log"
-	"time"
 
 	"github.com/GoogleCloudPlatform/go-endpoints/endpoints"
 	"golang.org/x/net/context"
@@ -24,11 +24,6 @@ type UpdateReq struct {
 	Device Device
 }
 
-type History struct {
-	Level int32     `json:"level"`
-	Time  time.Time `json:"timestamp"`
-}
-
 func (s *BatteryService) Update(c context.Context, r *UpdateReq) error {
 	u, err := getCurrentUser(c)
 	if err != nil {
@@ -45,11 +40,21 @@ func (s *BatteryService) Update(c context.Context, r *UpdateReq) error {
 	}
 
 	// Store Histories
-	for _, b := range r.Device.Batteries {
+	bs := r.Device.Batteries
+	for _, b := range bs {
 		log.Debugf(c, "%#v", batteryKey(u, d.DeviceId, b.Time, c))
 		_, err = datastore.Put(c, batteryKey(u, d.DeviceId, b.Time, c), &b)
 		if err != nil {
 			log.Debugf(c, "%#v", err)
+			return err
+		}
+	}
+	latest := bs[len(bs)-1]
+
+	if latest.Battery <= 15 {
+		// Notify
+		err = notify(c, d.DeviceName+" battery low", fmt.Sprintf("%d%%", latest.Battery), []string{myNexus5x})
+		if err != nil {
 			return err
 		}
 	}
