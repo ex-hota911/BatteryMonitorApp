@@ -3,18 +3,24 @@
   "description": "Make the current page red",
   "version": "2.0",
   "permissions": [
-    "activeTab", "alarms", "identity"
+	"activeTab",
+	"alarms",
+	"identity",
+	"https://icumn7abiu.appspot.com/",
+	"http://localhost/*"
   ],
   "oauth2": {
     "client_id": "546634630324-5cu4mgk7vmnpe2jhb2ouhmo8m3h84pnb.apps.googleusercontent.com",
     "scopes": ["https://www.googleapis.com/auth/userinfo.email"]
   },
   "background": {
-    "scripts": ["background.js", "gapi-chrome-apps.js"],
+    "scripts": ["background.js"],
     "persistent": false
   },
   "browser_action": {
     "default_title": "Make this page red"
   },
-  "manifest_version": 2
+  "manifest_version": 2,
+
+  "content_security_policy": "script-src 'self' https://apis.google.com; object-src 'self'"
 }
