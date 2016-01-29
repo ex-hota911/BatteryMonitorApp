@@ -41,9 +41,16 @@ func (s *BatteryService) Update(c context.Context, r *UpdateReq) error {
 
 	// Store Histories
 	bs := r.Device.Batteries
+	// TODO: It reads and writes N times. Should be optimized.
 	for _, b := range bs {
-		log.Debugf(c, "%#v", batteryKey(u, d.DeviceId, b.Time, c))
-		_, err = datastore.Put(c, batteryKey(u, d.DeviceId, b.Time, c), &b)
+		key := batteryKey(u, d.DeviceId, b.Time, c)
+		h, err := getHistory(key, c)
+		if err != nil {
+			log.Debugf(c, "%#v", err)
+			return err
+		}
+		h.Batteries = append(h.Batteries, b)
+		_, err = datastore.Put(c, key, h)
 		if err != nil {
 			log.Debugf(c, "%#v", err)
 			return err

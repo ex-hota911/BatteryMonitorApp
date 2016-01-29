@@ -12,6 +12,10 @@ import (
 	"google.golang.org/appengine/user"
 )
 
+const (
+	DATE_FORMAT = "20060102"
+)
+
 type User struct {
 	UserId string `datastore:"-"` // User.ID
 }
@@ -27,8 +31,12 @@ type Device struct {
 }
 
 type Battery struct {
-	Time    time.Time `json:"time" datastore:"-"` // timestamp
-	Battery int32     `json:"battery"`            // 0 - 100.
+	Time    time.Time `json:"time"`    // timestamp
+	Battery int32     `json:"battery"` // 0 - 100.
+}
+
+type History struct {
+	Batteries []Battery
 }
 
 func userKey(u *User, c context.Context) *datastore.Key {
@@ -45,6 +53,25 @@ func batteryKey(u *User, d string, t time.Time, c context.Context) *datastore.Ke
 	dk := deviceKey(u, d, c)
 	log.Debugf(c, "%#v", dk)
 	return datastore.NewKey(c, "Battery", "", t.Unix(), dk)
+}
+
+func historyKey(u *User, d string, t time.Time, c context.Context) *datastore.Key {
+	dk := deviceKey(u, d, c)
+	return datastore.NewKey(c, "History", toDate(t), 0, dk)
+}
+
+func getHistory(key *datastore.Key, c context.Context) (*History, error) {
+	h := new(History)
+	err := datastore.Get(c, key, h)
+	if err == datastore.ErrNoSuchEntity {
+		err = nil
+	}
+	return h, err
+}
+
+// toDate is the StringID of historyKey.
+func toDate(t time.Time) string {
+	return t.UTC().Format(DATE_FORMAT)
 }
 
 func populateKey(k *datastore.Key, b *Battery) {

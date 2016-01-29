@@ -17,6 +17,7 @@ func init() {
 	http.HandleFunc("/", root)
 	http.HandleFunc("/register", register)
 	http.HandleFunc("/battery", battery)
+	http.HandleFunc("/api/v1/battery", batteryApi)
 }
 
 func root(w http.ResponseWriter, r *http.Request) {
@@ -49,19 +50,22 @@ func root(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Debugf(c, "hi")
 	history := [][]Battery{}
 	for _, key := range keys {
-		qb := datastore.NewQuery("Battery").Ancestor(key).Order("-__key__")
-		h := []Battery{}
-		keys, err := qb.GetAll(c, &h)
+		qb := datastore.NewQuery("History").Ancestor(key).Order("-__key__").Limit(7)
+		h := []History{}
+		_, err := qb.GetAll(c, &h)
 		if err != nil && !isErrFieldMismatch(err) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		for i, k := range keys {
-			populateKey(k, &h[i])
+		log.Debugf(c, "%#v", h)
+		x := []Battery{}
+		for _, his := range h {
+			x = append(x, his.Batteries...)
 		}
-		history = append(history, h)
+		history = append(history, x)
 	}
 
 	data := map[string]interface{}{
@@ -117,10 +121,22 @@ func register(w http.ResponseWriter, r *http.Request) {
 }
 
 func battery(w http.ResponseWriter, r *http.Request) {
+	if err := batteryBase(w, r); err == nil {
+		http.Redirect(w, r, "/", http.StatusFound)
+	}
+}
+
+func batteryApi(w http.ResponseWriter, r *http.Request) {
+	if err := batteryBase(w, r); err == nil {
+		w.Write([]byte{})
+	}
+}
+
+func batteryBase(w http.ResponseWriter, r *http.Request) error {
 	c := appengine.NewContext(r)
 	u := toUser(user.Current(c))
 	if u == nil {
-		http.Redirect(w, r, "/", http.StatusFound)
+		return nil
 	}
 
 	device := r.FormValue("device_id")
@@ -128,7 +144,7 @@ func battery(w http.ResponseWriter, r *http.Request) {
 	battery, err := strconv.Atoi(r.FormValue("battery"))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+		return err
 	}
 
 	t := time.Now()
@@ -138,17 +154,28 @@ func battery(w http.ResponseWriter, r *http.Request) {
 		Time:    t,
 	}
 
-	_, err = datastore.Put(c, batteryKey(u, device, t, c), &b)
-	if err != nil {
+	// New storage format.
+	key := historyKey(u, device, t, c)
+	h, err := getHistory(key, c)
+	if err != nil && err != datastore.ErrNoSuchEntity {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return err
 	}
 
+	h.Batteries = append(h.Batteries, b)
+	_, err = datastore.Put(c, key, h)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return err
+	}
+
+	// Notify
 	err = notify(c, device+"Nexus 5x battery low", fmt.Sprintf("%d%%", battery), []string{myNexus5x})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return err
 	}
 
-	http.Redirect(w, r, "/", http.StatusFound)
+	return nil
 }
