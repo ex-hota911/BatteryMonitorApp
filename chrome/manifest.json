@@ -1,5 +1,5 @@
 {
-  "name": "Page Redder",
+  "name": "Battery Monitor",
   "description": "Make the current page red",
   "version": "2.0",
   "permissions": [
@@ -21,6 +21,4 @@
     "default_title": "Make this page red"
   },
   "manifest_version": 2,
-
-  "content_security_policy": "script-src 'self' https://apis.google.com; object-src 'self'"
 }
