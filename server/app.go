@@ -171,10 +171,12 @@ func batteryBase(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	// Notify
-	err = notify(c, device+"Nexus 5x battery low", fmt.Sprintf("%d%%", battery), []string{myNexus5x})
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return err
+	if battery <= 15 {
+		err = notify(c, device+"Nexus 5x battery low", fmt.Sprintf("%d%%", battery), []string{myNexus5x})
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return err
+		}
 	}
 
 	return nil

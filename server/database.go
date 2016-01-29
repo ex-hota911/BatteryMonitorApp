@@ -16,6 +16,14 @@ const (
 	DATE_FORMAT = "20060102"
 )
 
+type DeviceType int
+
+const (
+	// Source Enum
+	ANDROID DeviceType = iota
+	PC
+)
+
 type User struct {
 	UserId string `datastore:"-"` // User.ID
 }
@@ -25,6 +33,7 @@ type Device struct {
 	DeviceId       string `datastore:"-"` // Unique ID for a device
 	DeviceName     string // Display name.
 	AlertThreshold int32  // 0 - 100.
+	DeviceType     DeviceType
 
 	// For API
 	Batteries []Battery `database:"-"`

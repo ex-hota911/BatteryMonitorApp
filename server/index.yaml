@@ -36,3 +36,9 @@ indexes:
   properties:
   - name: Date
     direction: desc
+
+- kind: History
+  ancestor: yes
+  properties:
+  - name: __key__
+    direction: desc
