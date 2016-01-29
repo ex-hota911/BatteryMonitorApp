@@ -20,5 +20,5 @@
   "browser_action": {
     "default_title": "Make this page red"
   },
-  "manifest_version": 2,
+  "manifest_version": 2
 }

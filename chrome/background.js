@@ -1,5 +1,5 @@
-//var ROOT = 'https://icumn7abiu.appspot.com'
-var ROOT = 'localhost:8080'
+var ROOT = 'https://icumn7abiu.appspot.com'
+//var ROOT = 'localhost:8080'
 
 // Called when the user clicks on the browser action.
 chrome.browserAction.onClicked.addListener(function(tab) {
@@ -34,13 +34,15 @@ function updateBatteryStatus(battery) {
   formData.append("device_id", 'chrome_extension');
   formData.append("battery", level);
 
-  xhr.open("POST", ROOT + "/battery");
+  xhr.open("POST", ROOT + "/api/v1/battery");
   xhr.send(formData);
 }
 
 // Register listener.
 navigator.getBattery().then(function(battery) {
   console.log(battery);
+  updateBatteryStatus(battery)
+
   battery.addEventListener('levelchange', function() {
 	updateBatteryStatus(battery);
   });
