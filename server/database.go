@@ -48,6 +48,20 @@ type History struct {
 	Batteries []Battery
 }
 
+type ByTime []Battery
+
+func (b ByTime) Len() int {
+	return len(b)
+}
+
+func (b ByTime) Swap(i, j int) {
+	b[i], b[j] = b[j], b[i]
+}
+
+func (b ByTime) Less(i, j int) bool {
+	return b[i].Time.Before(b[j].Time)
+}
+
 func userKey(u *User, c context.Context) *datastore.Key {
 	return datastore.NewKey(c, "User", u.UserId, 0, nil)
 }

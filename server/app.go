@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"sort"
 	"strconv"
 	"time"
 
@@ -65,6 +66,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 		for _, his := range h {
 			x = append(x, his.Batteries...)
 		}
+		sort.Sort(ByTime(x))
 		history = append(history, x)
 	}
 
