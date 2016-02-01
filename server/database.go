@@ -20,8 +20,9 @@ type DeviceType int
 
 const (
 	// Source Enum
-	ANDROID DeviceType = iota
-	PC
+	UNDEFINED DeviceType = 0
+	ANDROID              = 1
+	PC                   = 2
 )
 
 type User struct {
@@ -40,8 +41,9 @@ type Device struct {
 }
 
 type Battery struct {
-	Time    time.Time `json:"time"`    // timestamp
-	Battery int32     `json:"battery"` // 0 - 100.
+	Time     time.Time `json:"time"`    // timestamp
+	Battery  int32     `json:"battery"` // 0 - 100.
+	Charging bool
 }
 
 type History struct {
@@ -70,12 +72,6 @@ func deviceKey(u *User, d string, c context.Context) *datastore.Key {
 	uk := userKey(u, c)
 	log.Debugf(c, "%#v", uk)
 	return datastore.NewKey(c, "Device", d, 0, uk)
-}
-
-func batteryKey(u *User, d string, t time.Time, c context.Context) *datastore.Key {
-	dk := deviceKey(u, d, c)
-	log.Debugf(c, "%#v", dk)
-	return datastore.NewKey(c, "Battery", "", t.Unix(), dk)
 }
 
 func historyKey(u *User, d string, t time.Time, c context.Context) *datastore.Key {

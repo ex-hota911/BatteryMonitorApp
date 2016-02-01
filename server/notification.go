@@ -3,6 +3,7 @@ package server
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -31,6 +32,10 @@ type Notification struct {
 }
 
 type Data struct {
+}
+
+func notifyLowBattery(c context.Context, device string, level int32, to []string) error {
+	return notify(c, device+" battery low", fmt.Sprintf("%d%%", level), to)
 }
 
 func notify(ctx context.Context, title, body string, to []string) error {

@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"html/template"
 	"net/http"
 	"sort"
@@ -141,7 +140,7 @@ func batteryBase(w http.ResponseWriter, r *http.Request) error {
 		return nil
 	}
 
-	device := r.FormValue("device_id")
+	deviceId := r.FormValue("device_id")
 
 	battery, err := strconv.Atoi(r.FormValue("battery"))
 	if err != nil {
@@ -149,15 +148,18 @@ func batteryBase(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
+	chargingStr := r.FormValue("charging")
+	charging := chargingStr != ""
+
 	t := time.Now()
 
 	b := Battery{
-		Battery: int32(battery),
-		Time:    t,
+		Battery:  int32(battery),
+		Time:     t,
+		Charging: charging,
 	}
 
-	// New storage format.
-	key := historyKey(u, device, t, c)
+	key := historyKey(u, deviceId, t, c)
 	h, err := getHistory(key, c)
 	if err != nil && err != datastore.ErrNoSuchEntity {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -173,8 +175,14 @@ func batteryBase(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	// Notify
-	if battery <= 15 {
-		err = notify(c, device+"Nexus 5x battery low", fmt.Sprintf("%d%%", battery), []string{myNexus5x})
+	if battery <= 15 && !charging {
+		key := deviceKey(u, deviceId, c)
+		var device Device
+		if err = datastore.Get(c, key, &device); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return err
+		}
+		err = notifyLowBattery(c, device.DeviceName, b.Battery, []string{myNexus5x})
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return err

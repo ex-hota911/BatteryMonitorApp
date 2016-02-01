@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	logger "log"
 
 	"github.com/GoogleCloudPlatform/go-endpoints/endpoints"
@@ -43,7 +42,7 @@ func (s *BatteryService) Update(c context.Context, r *UpdateReq) error {
 	bs := r.Device.Batteries
 	// TODO: It reads and writes N times. Should be optimized.
 	for _, b := range bs {
-		key := batteryKey(u, d.DeviceId, b.Time, c)
+		key := historyKey(u, d.DeviceId, b.Time, c)
 		h, err := getHistory(key, c)
 		if err != nil {
 			log.Debugf(c, "%#v", err)
@@ -58,9 +57,9 @@ func (s *BatteryService) Update(c context.Context, r *UpdateReq) error {
 	}
 	latest := bs[len(bs)-1]
 
-	if latest.Battery <= 15 {
+	if latest.Battery <= 15 && !latest.Charging {
 		// Notify
-		err = notify(c, d.DeviceName+" battery low", fmt.Sprintf("%d%%", latest.Battery), []string{myNexus5x})
+		err = notifyLowBattery(c, d.DeviceName, latest.Battery, []string{myNexus5x})
 		if err != nil {
 			return err
 		}
