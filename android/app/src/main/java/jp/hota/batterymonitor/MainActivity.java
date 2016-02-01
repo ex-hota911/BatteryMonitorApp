@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
             + "546634630324-mkannoor781g7scn86vodbhol9qss1ev.apps.googleusercontent.com";
 
     static int level = -1;
+    static boolean charging = false;
     static TextView textView;
     private Button button;
     private Button accountButton;
@@ -60,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
                 if (level < 0) {
                     return;
                 }
-                BatteryChangeReceiver.update(v.getContext(), level, null);
+                BatteryChangeReceiver.update(v.getContext(), level, charging, null);
             }
         });
 

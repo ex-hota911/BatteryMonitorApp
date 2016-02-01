@@ -37,16 +37,17 @@ public class BatteryChangeReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         int currentLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
         int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+        boolean charging = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1) != 0;
 
         if (currentLevel < 0 || scale <= 0) {
             return;
         }
 
         int level = (currentLevel * 100) / scale;
-        update(context, level, goAsync());
+        update(context, level, charging, goAsync());
     }
 
-    public static void update(Context context, int level, @Nullable final PendingResult result) {
+    public static void update(Context context, int level, boolean charging, @Nullable final PendingResult result) {
         credential =
                 GoogleAccountCredential.usingAudience(context, CLIENT_ID);
 
@@ -66,6 +67,7 @@ public class BatteryChangeReceiver extends BroadcastReceiver {
 
         Log.d(BatteryChangeReceiver.class.getName(), "" + level);
         MainActivity.level = level;
+        MainActivity.charging = charging;
         if (MainActivity.textView != null) {
             MainActivity.textView.setText("" + level);
         }
@@ -76,6 +78,7 @@ public class BatteryChangeReceiver extends BroadcastReceiver {
 
         Battery battery = new Battery()
                 .setBattery(level)
+                .setCharging(charging)
                 .setTime(new DateTime(new Date()));
         String androidId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
         Device device = new Device()
