@@ -16,8 +16,9 @@ chrome.runtime.onInstalled.addListener(function(details){
  * Updates the battery status.
  */
 function updateBatteryStatus(battery) {
-  console.log(battery);
   var level = battery.level * 100;
+  var charging = (battery.charging)? "charging" : "";
+  console.log(battery);
   console.log(level);
 
   var xhr = new XMLHttpRequest();
@@ -33,6 +34,7 @@ function updateBatteryStatus(battery) {
   // TODO: Set device ID.
   formData.append("device_id", 'chrome_extension');
   formData.append("battery", level);
+  formData.append("charging", charging);
 
   xhr.open("POST", ROOT + "/api/v1/battery");
   xhr.send(formData);

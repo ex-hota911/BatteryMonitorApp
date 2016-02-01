@@ -148,8 +148,7 @@ func batteryBase(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	chargingStr := r.FormValue("charging")
-	charging := chargingStr != ""
+	charging := r.FormValue("charging") != ""
 
 	t := time.Now()
 
