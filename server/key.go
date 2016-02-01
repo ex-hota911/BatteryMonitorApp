@@ -1,6 +1,6 @@
 package server
 
-const (
+var (
 	webClientId            = ""
 	androidReleaseClientId = ""
 	androidDebugClientId   = ""
