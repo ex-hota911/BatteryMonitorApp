@@ -16,7 +16,8 @@ chrome.runtime.onInstalled.addListener(function(details){
  * Updates the battery status.
  */
 function updateBatteryStatus(battery) {
-  var level = battery.level * 100;
+  // Make sure level is an int.
+  var level = Math.floor(battery.level * 100);
   var charging = (battery.charging)? "charging" : "";
   console.log(battery);
   console.log(level);
