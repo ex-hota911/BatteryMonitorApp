@@ -43,7 +43,7 @@ type Device struct {
 type Battery struct {
 	Time     time.Time `json:"time"`    // timestamp
 	Battery  int32     `json:"battery"` // 0 - 100.
-	Charging bool
+	Charging bool      `json:"charging"`
 }
 
 type History struct {

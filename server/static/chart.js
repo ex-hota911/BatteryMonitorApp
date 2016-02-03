@@ -14,22 +14,35 @@ function drawCharts() {
 function drawChart(d, id) {
 	var data = new google.visualization.DataTable();
     data.addColumn('datetime', 'Time');
-    data.addColumn('number', 'Battery');
+    data.addColumn('number', 'Charging');
+    data.addColumn('number', 'On Battery');
+
     for(var i = 0; i < d.length; i++) {
-		data.addRow([new Date(d[i].time), d[i].battery])
+	  if (i > 0 && d[i-1].charging != d[i].charging) {
+		// The state is changed. Adding data points for both in order to connect the lines
+		data.addRow([new Date(d[i].time), d[i].battery, d[i].battery]);
+	  } else if (d[i].charging) {
+		data.addRow([new Date(d[i].time), d[i].battery, null]);
+	  } else {
+		data.addRow([new Date(d[i].time), null, d[i].battery]);
+	  }
     }
+
     var options = {
-        title: 'Battery (%)',
-        // curveType: 'function',
-        legend: { position: 'bottom' },
-		vAxis: {
-			viewWindowMode: 'explicit',
-			viewWindow: {
-				min: 0,
-				max: 100,
-			}
+      title: 'Battery (%)',
+      legend: { position: 'bottom' },
+	  series: {
+        0: { color: 'red' },
+        1: { color: 'blue' },
+	  },
+	  vAxis: {
+		viewWindowMode: 'explicit',
+		viewWindow: {
+		  min: 0,
+		  max: 100,
 		}
+	  },
     };
-    var chart = new google.visualization.LineChart(document.getElementById(id));
+    var chart = new google.visualization.AreaChart(document.getElementById(id));
     chart.draw(data, options);
 }
