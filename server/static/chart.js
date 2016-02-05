@@ -17,15 +17,33 @@ function drawChart(d, id) {
   data.addColumn('number', 'Charging');
   data.addColumn('number', 'On Battery');
 
+  charging
+  x
+  charging
+  y
+  onbattery
+  y
+  onbattery
+  y
+  charging
+  x
+  charging
+  
+  
   for(var i = 0; i < d.length; i++) {
-	if (i > 0 && d[i-1].charging != d[i].charging) {
-	  // The state is changed. Adding data points for both in order to connect the lines
-	  data.addRow([new Date(d[i].time), d[i].battery, d[i].battery]);
-	} else if (d[i].charging) {
-	  data.addRow([new Date(d[i].time), d[i].battery, null]);
+	var charging = null;
+	var onBattery = null;
+
+	if (d[i].charging) {
+	  charging = d[i].battery;
+	  if ((i > 0 && !d[i-1].charging) || (i < d.length - 1 && !d[i+1].charging)) {
+		onBattery = d[i].battery
+	  }
 	} else {
-	  data.addRow([new Date(d[i].time), null, d[i].battery]);
+	  onBattery = d[i].battery;
 	}
+
+	data.addRow([new Date(d[i].time), charging, onBattery]);
   }
 
   var options = {
