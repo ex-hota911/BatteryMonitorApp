@@ -1,7 +1,10 @@
 package server
 
 import (
+	"encoding/json"
+	"fmt"
 	"html/template"
+	"math/rand"
 	"net/http"
 	"sort"
 	"strconv"
@@ -16,9 +19,12 @@ import (
 )
 
 func init() {
+	rand.Seed(time.Now().UnixNano())
+
 	http.HandleFunc("/", root)
 	http.HandleFunc("/register", register)
 	http.HandleFunc("/battery", battery)
+	http.HandleFunc("/api/v1/register", registerApi)
 	http.HandleFunc("/api/v1/battery", batteryApi)
 }
 
@@ -45,7 +51,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 	}
 
 	q := datastore.NewQuery("Device").Ancestor(userKey(u, c)).Order("DeviceName")
-	devices := []Device{}
+	devices := []*Device{}
 	keys := []*datastore.Key{}
 	if keys, err = q.GetAll(c, &devices); err != nil && !isErrFieldMismatch(err) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -54,7 +60,9 @@ func root(w http.ResponseWriter, r *http.Request) {
 
 	log.Debugf(c, "hi")
 	history := [][]Battery{}
-	for _, key := range keys {
+	for i, key := range keys {
+		populateDeviceId(key, devices[i])
+
 		qb := datastore.NewQuery("History").Ancestor(key).Order("-__key__").Limit(7)
 		h := []History{}
 		_, err := qb.GetAll(c, &h)
@@ -123,6 +131,43 @@ func register(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 
+type RegisterResponse struct {
+	ID string `json:"id"`
+}
+
+func registerApi(w http.ResponseWriter, r *http.Request) {
+	c := appengine.NewContext(r)
+	u := toUser(user.Current(c))
+	if u == nil {
+		return
+	}
+
+	deviceId := "api" + strconv.Itoa(rand.Int())
+	d := Device{
+		UserId:     u.UserId,
+		DeviceId:   deviceId,
+		DeviceName: "Unknown",
+	}
+
+	_, err := datastore.Put(c, deviceKey(u, deviceId, c), &d)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	resp := RegisterResponse{
+		ID: deviceId,
+	}
+
+	bytes, err := json.Marshal(resp)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Write(bytes)
+}
+
 func battery(w http.ResponseWriter, r *http.Request) {
 	if err := batteryBase(w, r); err == nil {
 		http.Redirect(w, r, "/", http.StatusFound)
@@ -160,6 +205,7 @@ func batteryBase(w http.ResponseWriter, r *http.Request) error {
 		Charging: charging,
 	}
 
+	log.Debugf(c, fmt.Sprintf("%+v", b))
 	key := historyKey(u, deviceId, t, c)
 	h, err := getHistory(key, c)
 	if err != nil && err != datastore.ErrNoSuchEntity {

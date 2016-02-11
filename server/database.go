@@ -73,18 +73,23 @@ func (b ByTime) Less(i, j int) bool {
 }
 
 func userKey(u *User, c context.Context) *datastore.Key {
-	return datastore.NewKey(c, "User", u.UserId, 0, nil)
+	uk := datastore.NewKey(c, "User", u.UserId, 0, nil)
+	log.Debugf(c, "%#v", uk)
+	return uk
 }
 
 func deviceKey(u *User, d string, c context.Context) *datastore.Key {
 	uk := userKey(u, c)
-	log.Debugf(c, "%#v", uk)
-	return datastore.NewKey(c, "Device", d, 0, uk)
+	dk := datastore.NewKey(c, "Device", d, 0, uk)
+	log.Debugf(c, "%#v", dk)
+	return dk
 }
 
 func historyKey(u *User, d string, t time.Time, c context.Context) *datastore.Key {
 	dk := deviceKey(u, d, c)
-	return datastore.NewKey(c, "History", toDate(t), 0, dk)
+	hk := datastore.NewKey(c, "History", toDate(t), 0, dk)
+	log.Debugf(c, "%#v", hk)
+	return hk
 }
 
 func getHistory(key *datastore.Key, c context.Context) (*History, error) {
@@ -103,6 +108,10 @@ func toDate(t time.Time) string {
 
 func populateKey(k *datastore.Key, b *Battery) {
 	b.Time = time.Unix(k.IntID(), 0)
+}
+
+func populateDeviceId(k *datastore.Key, d *Device) {
+	d.DeviceId = k.StringID()
 }
 
 // getCurrentUser retrieves a user associated with the request.
