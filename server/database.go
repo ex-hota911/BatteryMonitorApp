@@ -4,6 +4,8 @@ import (
 	"errors"
 	"time"
 
+	"keys"
+
 	"github.com/GoogleCloudPlatform/go-endpoints/endpoints"
 	"golang.org/x/net/context"
 
@@ -14,6 +16,12 @@ import (
 
 const (
 	DATE_FORMAT = "20060102"
+)
+
+var (
+	scopes    = []string{endpoints.EmailScope}
+	clientIds = []string{keys.WebClientId, keys.AndroidReleaseClientId, keys.AndroidDebugClientId, endpoints.APIExplorerClientID}
+	audiences = []string{keys.WebClientId, keys.AndroidReleaseClientId, keys.AndroidDebugClientId}
 )
 
 type DeviceType int

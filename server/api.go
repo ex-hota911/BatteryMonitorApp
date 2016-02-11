@@ -3,17 +3,13 @@ package server
 import (
 	logger "log"
 
+	"keys"
+
 	"github.com/GoogleCloudPlatform/go-endpoints/endpoints"
 	"golang.org/x/net/context"
 
 	"google.golang.org/appengine/datastore"
 	"google.golang.org/appengine/log"
-)
-
-var (
-	scopes    = []string{endpoints.EmailScope}
-	clientIds = []string{webClientId, androidReleaseClientId, androidDebugClientId, endpoints.APIExplorerClientID}
-	audiences = []string{webClientId, androidReleaseClientId, androidDebugClientId}
 )
 
 type BatteryService struct {
@@ -59,7 +55,7 @@ func (s *BatteryService) Update(c context.Context, r *UpdateReq) error {
 
 	if latest.Battery <= 15 && !latest.Charging {
 		// Notify
-		err = notifyLowBattery(c, d.DeviceName, latest.Battery, []string{myNexus5x})
+		err = notifyLowBattery(c, d.DeviceName, latest.Battery, []string{keys.MyNexus5x})
 		if err != nil {
 			return err
 		}

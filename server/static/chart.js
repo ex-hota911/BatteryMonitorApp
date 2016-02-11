@@ -17,19 +17,6 @@ function drawChart(d, id) {
   data.addColumn('number', 'Charging');
   data.addColumn('number', 'On Battery');
 
-  charging
-  x
-  charging
-  y
-  onbattery
-  y
-  onbattery
-  y
-  charging
-  x
-  charging
-  
-  
   for(var i = 0; i < d.length; i++) {
 	var charging = null;
 	var onBattery = null;

@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"time"
 
+	"keys"
+
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/datastore"
 	"google.golang.org/appengine/log"
@@ -181,7 +183,7 @@ func batteryBase(w http.ResponseWriter, r *http.Request) error {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return err
 		}
-		err = notifyLowBattery(c, device.DeviceName, b.Battery, []string{myNexus5x})
+		err = notifyLowBattery(c, device.DeviceName, b.Battery, []string{keys.MyNexus5x})
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return err

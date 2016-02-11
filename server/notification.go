@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 
+	"keys"
+
 	"golang.org/x/net/context"
 	"google.golang.org/appengine/urlfetch"
 )
@@ -59,7 +61,7 @@ func notify(ctx context.Context, title, body string, to []string) error {
 		return err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "key="+gcmApplicationKey)
+	req.Header.Set("Authorization", "key="+keys.GcmApplicationKey)
 
 	c := urlfetch.Client(ctx)
 	resp, err := c.Do(req)
