@@ -43,6 +43,7 @@ type Device struct {
 	DeviceName     string // Display name.
 	AlertThreshold int32  // 0 - 100.
 	DeviceType     DeviceType
+	Disabled       bool
 
 	// For API
 	Batteries []Battery `database:"-"`

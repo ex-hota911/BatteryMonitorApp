@@ -51,17 +51,21 @@ func root(w http.ResponseWriter, r *http.Request) {
 	}
 
 	q := datastore.NewQuery("Device").Ancestor(userKey(u, c)).Order("DeviceName")
-	devices := []*Device{}
+	devices := []Device{}
 	keys := []*datastore.Key{}
 	if keys, err = q.GetAll(c, &devices); err != nil && !isErrFieldMismatch(err) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	log.Debugf(c, "hi")
 	history := [][]Battery{}
+	activeDevices := []Device{}
 	for i, key := range keys {
-		populateDeviceId(key, devices[i])
+		device := devices[i]
+		if device.Disabled {
+			continue
+		}
+		populateDeviceId(key, &device)
 
 		qb := datastore.NewQuery("History").Ancestor(key).Order("-__key__").Limit(7)
 		h := []History{}
@@ -76,12 +80,14 @@ func root(w http.ResponseWriter, r *http.Request) {
 			x = append(x, his.Batteries...)
 		}
 		sort.Sort(ByTime(x))
+
+		activeDevices = append(activeDevices, device)
 		history = append(history, x)
 	}
 
 	data := map[string]interface{}{
 		"User":           u,
-		"Devices":        devices,
+		"Devices":        activeDevices,
 		"BatteryHistory": history,
 		"LogoutUrl":      logoutUrl,
 	}
@@ -116,11 +122,14 @@ func register(w http.ResponseWriter, r *http.Request) {
 		threshold = int32(t)
 	}
 
+	disabled := r.FormValue("disabled") == "on"
+
 	g := Device{
 		UserId:         u.UserId,
 		DeviceId:       device,
 		DeviceName:     deviceName,
 		AlertThreshold: threshold,
+		Disabled:       disabled,
 	}
 
 	_, err := datastore.Put(c, deviceKey(u, device, c), &g)
