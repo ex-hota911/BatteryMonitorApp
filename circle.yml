@@ -6,7 +6,7 @@ dependencies:
 test:
   pre:
     - export PATH=$HOME/go_appengine:$PATH
-    - cd BatteryMonitorApp/server
+    - echo $PATH; pwd; cd BatteryMonitorApp/server
     - goapp get "github.com/GoogleCloudPlatform/go-endpoints/endpoints"
   override:
     - goapp test -v ./...
