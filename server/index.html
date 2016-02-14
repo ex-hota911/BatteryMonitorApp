@@ -17,7 +17,13 @@
 	<table border=1>
 	{{range $index, $device := .Devices}}
   	  <tr>
-		<td> {{$device.DeviceName}} ({{$device.DeviceId}}) </td>
+		<td> {{$device.DeviceName}} ({{$device.DeviceId}})
+		  <form action="/register" method="post">
+			<input type="hidden" name="device_id" value="{{$device.DeviceId}}">
+			<input type="hidden" name="disabled" value="on">
+			<input type="submit" value="x">
+		  </form>
+		</td>
 	  </tr>
 	  <tr>
 		<td><div id="chart_{{$index}}" style="width: 640px; height: 240px"></div></td>
