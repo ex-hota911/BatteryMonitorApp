@@ -3,9 +3,15 @@ machine:
     PATH: ~/go_appengine:$PATH
 
 dependencies:
+  cache_directories:
+    - ~/go_appengine
+
   override:
-    - curl -o $HOME/go_appengine_sdk_linux_amd64-1.9.32.zip "https://storage.googleapis.com/appengine-sdks/featured/go_appengine_sdk_linux_amd64-1.9.32.zip"
-    - unzip -q -d $HOME $HOME/go_appengine_sdk_linux_amd64-1.9.32.zip
+    - |
+      if [ ! -e ~/go_appengine ]; then
+        curl -o $HOME/go_appengine_sdk_linux_amd64-1.9.32.zip "https://storage.googleapis.com/appengine-sdks/featured/go_appengine_sdk_linux_amd64-1.9.32.zip"
+        unzip -q -d $HOME $HOME/go_appengine_sdk_linux_amd64-1.9.32.zip
+      fi
 
 test:
   pre:
