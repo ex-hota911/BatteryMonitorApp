@@ -20,6 +20,7 @@ import (
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
+	keys.Init()
 
 	http.HandleFunc("/", root)
 	http.HandleFunc("/register", register)
