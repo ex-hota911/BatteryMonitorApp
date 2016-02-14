@@ -10,8 +10,6 @@ import (
 	"strconv"
 	"time"
 
-	"keys"
-
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/datastore"
 	"google.golang.org/appengine/log"
@@ -20,7 +18,9 @@ import (
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
-	keys.Init()
+	if err := InitKeys(); err != nil {
+		panic(err.Error())
+	}
 
 	http.HandleFunc("/", root)
 	http.HandleFunc("/register", register)

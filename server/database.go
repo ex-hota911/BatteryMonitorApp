@@ -4,8 +4,6 @@ import (
 	"errors"
 	"time"
 
-	"keys"
-
 	"github.com/GoogleCloudPlatform/go-endpoints/endpoints"
 	"golang.org/x/net/context"
 

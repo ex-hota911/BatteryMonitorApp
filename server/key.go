@@ -1,4 +1,4 @@
-package keys
+package server
 
 import (
 	"encoding/json"
@@ -13,6 +13,8 @@ var (
 	GcmApplicationKey = ""
 
 	MyNexus5x = ""
+
+	keys = MySecretKeys{}
 )
 
 type MySecretKeys struct {
@@ -23,7 +25,7 @@ type MySecretKeys struct {
 	MyNexus5x              string `json:"my_nexus_5x"`
 }
 
-func Init() error {
+func InitKeys() error {
 	b, err := ioutil.ReadFile("secret.json")
 	if err != nil {
 		b, err = ioutil.ReadFile("secret.dev.json")
@@ -31,10 +33,12 @@ func Init() error {
 			return err
 		}
 	}
-	var keys MySecretKeys
+	var mySecretKeys MySecretKeys
 	if err = json.Unmarshal(b, &keys); err != nil {
 		return err
 	}
+
+	keys = mySecretKeys
 
 	WebClientId = keys.WebClientId
 	AndroidReleaseClientId = keys.AndroidReleaseClientId

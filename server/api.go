@@ -3,8 +3,6 @@ package server
 import (
 	logger "log"
 
-	"keys"
-
 	"github.com/GoogleCloudPlatform/go-endpoints/endpoints"
 	"golang.org/x/net/context"
 

@@ -7,8 +7,6 @@ import (
 	"log"
 	"net/http"
 
-	"keys"
-
 	"golang.org/x/net/context"
 	"google.golang.org/appengine/urlfetch"
 )
