@@ -1,8 +1,7 @@
 {
   "name": "Battery Monitor",
   "description": "Make the current page red",
-  "version": "2.1",
-  "update_url": "https://github.com/hota911/BatteryMonitorApp/raw/master/chrome/update.xml",
+  "version": "2.0",
   "permissions": [
 	"activeTab",
 	"alarms",

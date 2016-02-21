@@ -1,6 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<gupdate xmlns='http://www.google.com/update2/response' protocol='2.0'>
-  <app appid='nmigfbicdhakfffbanjbhhaopfcoefma'>
-    <updatecheck codebase='https://github.com/hota911/BatteryMonitorApp/raw/master/chrome/src.crx' version='2.1' />
-  </app>
-</gupdate>
