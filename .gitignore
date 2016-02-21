@@ -1,2 +1,3 @@
 # Store secret keys.
 secret.json
+*.pem
