@@ -2,6 +2,7 @@
   "name": "Battery Monitor",
   "description": "Make the current page red",
   "version": "2.0",
+  "update_url": "http://github.com/placeholder",
   "permissions": [
 	"activeTab",
 	"alarms",
