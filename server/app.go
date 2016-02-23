@@ -149,6 +149,7 @@ func registerApi(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
 	u := toUser(user.Current(c))
 	if u == nil {
+		http.Error(w, "User is not authorized", http.StatusUnauthorized)
 		return
 	}
 
@@ -194,6 +195,7 @@ func batteryBase(w http.ResponseWriter, r *http.Request) error {
 	c := appengine.NewContext(r)
 	u := toUser(user.Current(c))
 	if u == nil {
+		http.Error(w, "User is not authorized", http.StatusUnauthorized)
 		return nil
 	}
 

@@ -18,7 +18,6 @@ var deviceIdKey = "deviceId"
  * Updates the battery status.
  */
 function updateBatteryStatus(battery) {
-
   var deviceId = localStorage.getItem(deviceIdKey);
   if (deviceId == null) {
 	console.log("Device is not registered.");
@@ -60,12 +59,16 @@ function register() {
 	}
 	console.log(xhr.status);
 	console.log(xhr.responseText);
-	var resp = JSON.parse(xhr.responseText);
-	if (resp.id == undefined) {
-	  console.log("ID is not set in response!");
-	  return;
+	if (xhr.status == 200) {
+	  var resp = JSON.parse(xhr.responseText);
+	  if (resp.id == undefined) {
+		console.log("ID is not set in response!");
+		return;
+	  }
+	  localStorage.setItem(deviceIdKey, resp.id);
+	} else {
+	  //
 	}
-	localStorage.setItem(deviceIdKey, resp.id);
   };
 
   xhr.open("POST", ROOT + "/api/v1/register");
